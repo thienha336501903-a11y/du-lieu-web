@@ -9,7 +9,10 @@
     <style>
         body { font-family: 'Quicksand', sans-serif; background-color: #f3f4f6; }
         .active-tab { border-bottom: 3px solid #ff4d6d; color: #ff4d6d; font-weight: 800; }
-        .sale-badge { background-color: #ff4d6d; color: white; font-size: 10px; padding: 3px 8px; border-radius: 999px; position: absolute; top: 10px; left: 10px; font-weight: bold; text-transform: uppercase; box-shadow: 0 2px 4px rgba(255,77,109,0.3); }
+        .sale-badge { background-color: #ff4d6d; color: white; font-size: 10px; padding: 3px 8px; border-radius: 999px; position: absolute; top: 10px; left: 10px; font-weight: bold; text-transform: uppercase; box-shadow: 0 2px 4px rgba(255,77,109,0.3); z-index: 10; }
+        /* Style cho đồng hồ ngoài trang chủ */
+        .timer-badge { background: linear-gradient(90deg, #ff9a9e 0%, #fecfef 99%, #fecfef 100%); color: #d81159; font-size: 10px; padding: 4px 8px; border-bottom-left-radius: 16px; border-top-right-radius: 24px; position: absolute; top: 0; right: 0; font-weight: 800; z-index: 10; box-shadow: -2px 2px 4px rgba(0,0,0,0.05); display: none; }
+        
         .price-sale { color: #ff4d6d; font-weight: 800; font-size: 18px; }
         .price-old { text-decoration: line-through; color: #a1a1aa; font-size: 13px; margin-left: 6px; font-weight: 600; }
         .overlay { background-color: rgba(0,0,0,0.6); backdrop-filter: blur(2px); }
@@ -30,9 +33,9 @@
             <p class="text-gray-500 text-xs mt-1 font-semibold">Tự tay làm bánh thơm lừng tại nhà</p>
         </div>
         <div class="flex justify-around border-t overflow-x-auto bg-white px-2 rounded-b-3xl" id="tab-menu">
-            <button onclick="changeTab('hot')" id="tab-hot" class="py-3 px-3 active-tab text-gray-600 font-semibold text-sm">🔥 Khóa Hot</button>
-            <button onclick="changeTab('sale')" id="tab-sale" class="py-3 px-3 text-gray-600 font-semibold text-sm">⏳ Giảm Giá</button>
-            <button onclick="changeTab('all')" id="tab-all" class="py-3 px-3 text-gray-600 font-semibold text-sm">📚 Tất Cả</button>
+            <button onclick="changeTab('hot')" id="tab-hot" class="py-3 px-3 active-tab text-gray-600 font-semibold text-sm whitespace-nowrap">🔥 Khóa Hot</button>
+            <button onclick="changeTab('sale')" id="tab-sale" class="py-3 px-3 text-gray-600 font-semibold text-sm whitespace-nowrap">⏳ Giảm Giá</button>
+            <button onclick="changeTab('all')" id="tab-all" class="py-3 px-3 text-gray-600 font-semibold text-sm whitespace-nowrap">📚 Tất Cả</button>
         </div>
     </header>
 
@@ -59,29 +62,23 @@
     <div id="detail-modal" class="overlay fixed inset-0 z-50 hidden items-center justify-center p-4">
         <div class="bg-white rounded-[24px] w-full max-w-sm overflow-hidden relative shadow-2xl flex flex-col max-h-[90vh]">
             <button onclick="closeDetailModal()" class="absolute top-3 right-3 bg-black/40 text-white w-8 h-8 rounded-full flex items-center justify-center z-10 hover:bg-black/60">✕</button>
-            
             <div class="relative h-48 w-full bg-gray-100 shrink-0">
                 <img id="detail-img" src="" class="w-full h-full object-cover">
             </div>
-            
             <div class="p-5 flex flex-col flex-grow overflow-hidden">
                 <h2 id="detail-title" class="text-xl font-extrabold text-center text-gray-800 leading-tight"></h2>
                 <p id="detail-subtitle" class="text-center text-[11px] text-gray-500 font-semibold mt-1"></p>
-                
                 <div class="text-center mt-3 mb-3">
                     <span id="detail-price-sale" class="price-sale text-2xl"></span>
                     <span id="detail-price-old" class="price-old"></span>
                 </div>
-
                 <div id="sale-countdown-banner" class="bg-yellow-50 border border-yellow-200 text-yellow-700 text-center py-1.5 rounded-lg text-[11px] font-bold mb-4 hidden">
                     🔥 Sale kết thúc sau: <span id="countdown-timer" class="text-red-500"></span>
                 </div>
-
                 <div class="flex-grow overflow-y-auto custom-scrollbar pr-1 mb-4">
                     <p class="font-bold text-xs text-gray-800 mb-2">Nội dung chương trình:</p>
                     <div id="detail-content" class="text-[12px] text-gray-600 space-y-1.5 leading-relaxed"></div>
                 </div>
-
                 <button onclick="openPaymentModal()" class="w-full bg-[#ff4d6d] text-white py-3.5 rounded-xl font-extrabold text-sm uppercase shadow-[0_4px_14px_0_rgba(255,77,109,0.39)] hover:bg-[#ff3355]">Đăng ký ngay</button>
             </div>
         </div>
@@ -90,22 +87,17 @@
     <div id="payment-modal" class="overlay fixed inset-0 z-[60] hidden items-center justify-center p-4">
         <div class="bg-white rounded-[24px] w-full max-w-sm overflow-hidden relative p-6 max-h-[95vh] overflow-y-auto shadow-2xl">
             <button onclick="closePaymentModal()" class="absolute top-3 right-3 text-gray-400 text-xl font-bold p-2">✕</button>
-            
             <h2 class="text-lg font-extrabold mb-4 text-center text-pink-600 uppercase tracking-wider">Hoàn Tất Đăng Ký</h2>
-            
             <div id="payment-info" class="text-center mb-5"></div>
-            
             <form id="payment-form" onsubmit="handlePayment(event)" class="space-y-4">
                 <div>
                     <label class="block text-[11px] font-extrabold text-gray-600 mb-1 uppercase">Username Telegram của bạn:</label>
                     <input type="text" id="user-tele" required placeholder="@username" class="w-full border-2 border-gray-100 p-3 rounded-xl outline-none focus:border-pink-300 font-semibold text-sm transition-colors">
                 </div>
-                
                 <div>
                     <label class="block text-[11px] font-extrabold text-red-500 mb-1 uppercase">Tải ảnh Bill chuyển khoản:</label>
                     <input type="file" id="bill-img" accept="image/*" required class="w-full text-xs text-gray-500 file:bg-pink-50 file:border-0 file:rounded-lg file:px-4 file:py-2.5 file:text-pink-600 file:font-bold file:mr-3">
                 </div>
-
                 <button type="submit" id="submit-btn" class="w-full bg-pink-500 text-white py-3.5 rounded-xl font-extrabold shadow-lg shadow-pink-200 uppercase tracking-wider text-sm mt-2">Gửi cho Sunny duyệt</button>
             </form>
         </div>
@@ -120,7 +112,8 @@
         let currentCategory = 'All';
         let searchQuery = '';
         let currentSelectedItem = null;
-        let countdownInterval;
+        let detailCountdownInterval;
+        let globalTimerInterval; // Interval cho đồng hồ ngoài trang chủ
 
         function formatDriveUrl(url) {
             if (!url || !url.includes("drive.google.com")) return url;
@@ -146,6 +139,7 @@
                 const res = await fetch(DATA_URL + "?v=" + new Date().getTime());
                 db = await res.json();
                 render();
+                checkUrlAndOpenCourse(); // Kiểm tra xem khách có bấm từ Link Gửi Khách không
             } catch (e) { 
                 grid.innerHTML = '<div class="col-span-2 text-center text-red-500 font-bold">Lỗi kết nối dữ liệu!</div>';
             }
@@ -172,20 +166,21 @@
             list.forEach(item => {
                 const card = document.createElement('div');
                 card.className = "bg-white rounded-2xl shadow-sm overflow-hidden relative flex flex-col border border-gray-100";
-                
                 const imgLink = formatDriveUrl(item["Ảnh bìa"] || item["Ảnh"]);
                 const isSale = item["Giá Sale"] && item["Giá Sale"] !== item["Giá Gốc"];
                 
+                // Gắn thẻ data-endtime để làm đồng hồ đếm ngược
                 card.innerHTML = `
                     <div class="relative h-32 bg-gray-50">
                         <img src="${imgLink}" class="w-full h-full object-cover" loading="lazy" onerror="this.src='https://via.placeholder.com/400x300?text=Sunny'">
                         ${isSale ? `<div class="sale-badge">SALE</div>` : ''}
+                        <div class="timer-badge global-timer" data-endtime="${item["Kết thúc Sale"] || ''}">⏳ ...</div>
                     </div>
                     <div class="p-3 flex flex-col flex-grow">
                         <h3 class="font-extrabold text-[12px] h-8 line-clamp-2 text-gray-800 leading-tight">${item["Tên khóa"] || item["Tên món"]}</h3>
                         <div class="mt-auto pt-2">
                             ${item["Giá Sale"] ? `
-                                <div class="mb-2">
+                                <div class="mb-2 flex items-baseline">
                                     <span class="price-sale text-[15px]">${item["Giá Sale"]}</span>
                                     <span class="price-old text-[10px]">${item["Giá Gốc"]}</span>
                                 </div>
@@ -196,8 +191,54 @@
                 `;
                 grid.appendChild(card);
             });
+
+            // Khởi động đồng hồ đếm ngược toàn cục cho trang chủ
+            startGlobalTimers();
         }
 
+        // --- CƠ CHẾ ĐỒNG HỒ TRANG CHỦ ---
+        function startGlobalTimers() {
+            clearInterval(globalTimerInterval);
+            globalTimerInterval = setInterval(() => {
+                const timers = document.querySelectorAll('.global-timer');
+                timers.forEach(el => {
+                    const endStr = el.getAttribute('data-endtime');
+                    const endTime = parseDateString(endStr);
+                    if (endTime && endTime > new Date()) {
+                        const diff = endTime - new Date();
+                        const d = Math.floor(diff / (1000 * 60 * 60 * 24));
+                        const h = Math.floor((diff / (1000 * 60 * 60)) % 24);
+                        const m = Math.floor((diff / 1000 / 60) % 60);
+                        const s = Math.floor((diff / 1000) % 60);
+                        
+                        let timeText = `⏳ ${h.toString().padStart(2,'0')}:${m.toString().padStart(2,'0')}:${s.toString().padStart(2,'0')}`;
+                        if(d > 0) timeText = `⏳ ${d} ngày nữa`;
+                        
+                        el.innerText = timeText;
+                        el.style.display = 'block';
+                    } else {
+                        el.style.display = 'none';
+                    }
+                });
+            }, 1000);
+        }
+
+        // --- CƠ CHẾ TỰ ĐỘNG BẬT KHÓA HỌC KHI CÓ LINK ID ---
+        function checkUrlAndOpenCourse() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const courseId = urlParams.get('id');
+            if (courseId) {
+                // Tìm khóa học có ID tương ứng
+                const foundCourse = db.khoa_hoc.find(item => item["ID"] === courseId);
+                if (foundCourse) {
+                    openDetailModal(foundCourse);
+                    // Đổi URL cho sạch đẹp sau khi mở
+                    window.history.replaceState({}, document.title, window.location.pathname);
+                }
+            }
+        }
+
+        // Các hàm Modal
         function openDetailModal(item) {
             currentSelectedItem = item;
             const modal = document.getElementById('detail-modal');
@@ -208,18 +249,18 @@
             document.getElementById('detail-price-sale').innerText = item["Giá Sale"] || item["Giá Gốc"] || "Miễn phí";
             document.getElementById('detail-price-old').innerText = (item["Giá Sale"] && item["Giá Sale"] !== item["Giá Gốc"]) ? item["Giá Gốc"] : "";
 
-            clearInterval(countdownInterval);
+            clearInterval(detailCountdownInterval);
             const bannerEl = document.getElementById('sale-countdown-banner');
             const timerEl = document.getElementById('countdown-timer');
             const endSaleTime = parseDateString(item["Kết thúc Sale"]);
 
             if (endSaleTime && !isNaN(endSaleTime.getTime()) && endSaleTime > new Date()) {
                 bannerEl.classList.remove('hidden');
-                countdownInterval = setInterval(() => {
+                detailCountdownInterval = setInterval(() => {
                     const diff = endSaleTime - new Date();
                     if (diff <= 0) {
                         timerEl.innerText = "Đã kết thúc";
-                        clearInterval(countdownInterval);
+                        clearInterval(detailCountdownInterval);
                     } else {
                         const d = Math.floor(diff / (1000 * 60 * 60 * 24));
                         const h = Math.floor((diff / (1000 * 60 * 60)) % 24);
@@ -245,7 +286,6 @@
             }
             document.getElementById('detail-content').innerHTML = contentHtml;
 
-            // Xóa class hidden và hiển thị dạng flex
             modal.classList.remove('hidden');
             modal.classList.add('flex');
         }
@@ -254,7 +294,7 @@
             const modal = document.getElementById('detail-modal');
             modal.classList.remove('flex');
             modal.classList.add('hidden');
-            clearInterval(countdownInterval);
+            clearInterval(detailCountdownInterval);
         }
 
         function openPaymentModal() {
@@ -276,7 +316,6 @@
                 </div>
             `;
             
-            // Xóa class hidden và hiển thị dạng flex
             modal.classList.remove('hidden');
             modal.classList.add('flex');
         }
