@@ -85,10 +85,11 @@
         let currentSelectedItem = null;
         let detailCountdownInterval, globalTimerInterval;
 
+        // ĐÃ SỬA LỖI TẠI ĐÂY (Thêm dấu $ và đổi sang server lh3 siêu mượt)
         function formatDriveUrl(url) {
             if (!url || !url.includes("drive.google.com")) return url;
             let id = url.match(/[-\w]{25,}/);
-            return id ? `https://lh3.googleusercontent.com/d/$${id[0]}=w600` : url;
+            return id ? `https://lh3.googleusercontent.com/d/${id[0]}=w800` : url;
         }
 
         // Hàm chuyển đổi chuỗi ngày sang Date
@@ -101,12 +102,11 @@
             } catch(e) { return null; }
         }
 
-        // --- CỐT LÕI KIỂM TRA HẾT HẠN SALE ---
         function isSaleValid(item) {
             if (!item["Giá Sale"] || item["Giá Sale"] === item["Giá Gốc"]) return false;
             const endTime = parseDateString(item["Kết thúc Sale"]);
             if (!endTime) return true; 
-            return endTime > new Date(); // Chỉ TRẢ VỀ TRUE NẾU SALE CÒN HẠN
+            return endTime > new Date(); 
         }
 
         async function loadData() {
@@ -115,7 +115,6 @@
                 db = await res.json();
                 render();
                 
-                // MỞ KHÓA HỌC TỰ ĐỘNG TỪ LINK GỬI KHÁCH
                 const urlId = new URLSearchParams(window.location.search).get('id');
                 if (urlId) {
                     const foundCourse = db.khoa_hoc.find(i => i["ID"] === urlId);
@@ -184,7 +183,6 @@
             document.getElementById('detail-img').src = formatDriveUrl(item["Ảnh bìa"] || item["Ảnh"]);
             document.getElementById('detail-title').innerText = item["Tên khóa"] || item["Tên món"];
             
-            // Hiện giá phụ thuộc vào việc Sale còn hiệu lực hay không
             document.getElementById('detail-price-sale').innerText = activeSale ? item["Giá Sale"] : (item["Giá Gốc"] || "Miễn phí");
             document.getElementById('detail-price-old').innerText = activeSale ? item["Giá Gốc"] : "";
 
@@ -219,7 +217,6 @@
             closeDetailModal(); 
             const item = currentSelectedItem;
             const activeSale = isSaleValid(item);
-            // Lấy đúng giá để thanh toán
             const price = activeSale ? item["Giá Sale"] : (item["Giá Gốc"] || "0đ");
 
             document.getElementById('payment-info').innerHTML = `
