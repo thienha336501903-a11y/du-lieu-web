@@ -32,6 +32,19 @@
         </div>
     </header>
 
+    <div id="filter-bar" class="p-4 hidden">
+        <div class="relative mb-3 flex items-center bg-white border border-pink-200 rounded-full shadow-sm px-4">
+            <span class="text-pink-400 text-lg">🔍</span>
+            <input type="text" id="search-input" oninput="filterSearch()" placeholder="Tìm khóa học bạn muốn..." class="w-full p-2.5 outline-none bg-transparent placeholder-gray-400 text-sm font-semibold">
+        </div>
+        <div class="flex gap-2 overflow-x-auto pb-1 scrollbar-hide">
+            <button onclick="setCategory('All')" class="bg-white border border-gray-200 px-4 py-1.5 rounded-full text-xs font-bold text-gray-600 whitespace-nowrap active:bg-pink-50">Tất cả</button>
+            <button onclick="setCategory('Bánh')" class="bg-white border border-gray-200 px-4 py-1.5 rounded-full text-xs font-bold text-gray-600 whitespace-nowrap">🍩 Bánh</button>
+            <button onclick="setCategory('Chè')" class="bg-white border border-gray-200 px-4 py-1.5 rounded-full text-xs font-bold text-gray-600 whitespace-nowrap">🍧 Chè</button>
+            <button onclick="setCategory('Đồ mặn')" class="bg-white border border-gray-200 px-4 py-1.5 rounded-full text-xs font-bold text-gray-600 whitespace-nowrap">🍗 Đồ mặn</button>
+        </div>
+    </div>
+
     <main id="content-grid" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 px-4 py-6"></main>
 
     <nav class="fixed bottom-0 left-0 right-0 bg-white border-t flex justify-around p-3 z-40 rounded-t-3xl shadow-lg">
@@ -70,16 +83,21 @@
             
             <div id="payment-info" class="mb-4"></div>
             
-            <form id="payment-form" onsubmit="handlePayment(event)" class="space-y-3">
-                <div>
-                    <label class="block text-[11px] font-extrabold text-gray-600 mb-1">USERNAME TELEGRAM CỦA BẠN:</label>
-                    <input type="text" id="user-tele" required placeholder="@username_cua_ban" class="w-full border-2 border-gray-200 p-3 rounded-xl outline-none font-semibold text-sm focus:border-pink-300 transition-colors">
+            <form id="payment-form" onsubmit="handlePayment(event)" class="space-y-4">
+                <div class="bg-blue-50/50 p-3 rounded-xl border border-blue-100">
+                    <label class="block text-[12px] font-extrabold text-blue-800 mb-2">1. Điền tên Nick Telegram của bạn để Admin duyệt vào nhóm học:</label>
+                    <input type="text" id="user-tele" required placeholder="Ví dụ: @hoahong..." class="w-full border-2 border-blue-200 p-3 rounded-xl outline-none font-semibold text-sm focus:border-blue-400 transition-colors">
                 </div>
-                <div>
-                    <label class="block text-[11px] font-extrabold text-red-500 mb-1">TẢI ẢNH BILL CHUYỂN KHOẢN:</label>
-                    <input type="file" id="bill-img" accept="image/*" required class="w-full text-xs file:bg-pink-50 file:border-0 file:rounded-lg file:px-4 file:py-2.5 file:text-pink-600 font-bold border-2 border-dashed border-pink-100 p-2 rounded-xl">
+                
+                <div class="bg-yellow-50 p-3 rounded-xl border-2 border-dashed border-yellow-400">
+                    <label class="block text-[12px] font-extrabold text-red-600 mb-2">2. Ấn "Chọn tệp" để tải ảnh bill chuyển khoản thành công để Admin duyệt:</label>
+                    <input type="file" id="bill-img" accept="image/*" required class="w-full text-xs file:bg-red-500 file:text-white file:border-0 file:rounded-lg file:px-4 file:py-2.5 file:font-bold file:cursor-pointer hover:file:bg-red-600 file:mr-3 transition-colors">
                 </div>
-                <button type="submit" id="submit-btn" class="w-full bg-pink-500 text-white py-3.5 rounded-xl font-extrabold uppercase text-sm mt-2 shadow-[0_4px_14px_0_rgba(255,77,109,0.39)]">Gửi Cho Sunny Duyệt</button>
+                
+                <div class="mt-4">
+                    <button type="submit" id="submit-btn" class="w-full bg-pink-500 text-white py-4 rounded-xl font-extrabold uppercase text-[13px] shadow-[0_4px_14px_0_rgba(255,77,109,0.39)] active:scale-95 transition-all">Xác nhận đã thanh toán & vào lớp</button>
+                    <p class="text-[11px] text-gray-500 text-center mt-3 font-semibold px-2">⚠️ Lưu ý: Admin sẽ duyệt vào nhóm học ở Telegram sau tối đa 24h kể từ khi ấn Xác nhận.</p>
+                </div>
             </form>
         </div>
     </div>
@@ -90,14 +108,14 @@
 
         let db = { khoa_hoc: [], thu_vien: [] };
         let currentTab = 'hot';
+        let currentCategory = 'All'; // Biến cần cho lọc
+        let searchQuery = ''; // Biến cần cho tìm kiếm
         let currentSelectedItem = null;
         let detailCountdownInterval, globalTimerInterval;
 
-        // ĐÃ FIX 100%: Dùng thẳng lh3.googleusercontent.com và thêm dấu $
         function formatDriveUrl(url) {
             if (!url || !url.includes("drive.google.com")) return url;
             let id = url.match(/[-\w]{25,}/);
-            // Cú pháp chuẩn xác lấy ảnh chất lượng cao từ Drive không bị chặn
             return id ? `https://lh3.googleusercontent.com/d/${id[0]}` : url;
         }
 
@@ -140,6 +158,15 @@
             else if (currentTab === 'sale') list = db.khoa_hoc.filter(i => isSaleValid(i));
             else if (currentTab === 'library') list = db.thu_vien;
             else list = db.khoa_hoc;
+
+            // Bộ lọc danh mục
+            if (currentCategory !== 'All') list = list.filter(i => i["Phân loại"] === currentCategory);
+            if (searchQuery) list = list.filter(i => (i["Tên khóa"] || i["Tên món"]).toLowerCase().includes(searchQuery.toLowerCase()));
+
+            if (list.length === 0) {
+                grid.innerHTML = '<div class="col-span-2 md:col-span-3 text-center py-10 text-gray-400 font-bold text-sm">Chưa có món nào mục này bạn ơi!</div>';
+                return;
+            }
 
             list.forEach(item => {
                 const card = document.createElement('div');
@@ -228,6 +255,7 @@
             const price = activeSale ? item["Giá Sale"] : (item["Giá Gốc"] || "0đ");
             const qrLink = formatDriveUrl(item["QR Ngân hàng"]);
 
+            // (Yêu cầu 2): Sửa nội dung Tên FB/Zalo thay vì Tên Tele
             document.getElementById('payment-info').innerHTML = `
                 <div class="text-center mb-3">
                     <p class="font-extrabold text-sm mb-3 text-gray-700">Khóa học: <span class="text-pink-500">${item["Tên khóa"]}</span></p>
@@ -265,7 +293,7 @@
                     <div class="mt-3 bg-yellow-50 border border-yellow-200 p-2.5 rounded-xl text-center">
                         <p class="text-[11px] text-yellow-800 font-semibold mb-1">✏️ Copy nội dung chuyển khoản bên dưới:</p>
                         <div class="flex items-center justify-center gap-2">
-                            <strong class="text-red-500 text-sm select-all">Tên Tele + ${item["ID"]}</strong>
+                            <strong class="text-red-500 text-sm select-all">Tên FB hoặc Zalo của Bạn + ${item["ID"]}</strong>
                         </div>
                     </div>
                 </div>
@@ -275,8 +303,12 @@
         }
 
         function closePaymentModal() { document.getElementById('payment-modal').classList.add('hidden'); document.getElementById('payment-modal').classList.remove('flex'); }
-        function changeTab(t) { currentTab = t; document.querySelectorAll('#tab-menu button').forEach(b => b.classList.remove('active-tab')); document.getElementById('tab-'+t).classList.add('active-tab'); render(); }
+        function changeTab(t) { currentTab = t; document.querySelectorAll('#tab-menu button').forEach(b => b.classList.remove('active-tab')); document.getElementById('tab-'+t).classList.add('active-tab'); document.getElementById('filter-bar').classList.toggle('hidden', !(t === 'all' || t === 'library')); render(); }
         
+        // (Yêu cầu 1): Hàm hỗ trợ thanh Lọc
+        function filterSearch() { searchQuery = document.getElementById('search-input').value; render(); }
+        function setCategory(cat) { currentCategory = cat; render(); }
+
         function copySTK(stk) {
             navigator.clipboard.writeText(stk).then(() => {
                 alert("✅ Đã sao chép Số Tài Khoản: " + stk);
@@ -287,15 +319,54 @@
             });
         }
 
+        // (Yêu cầu 6, 7): Cảnh báo thiếu thông tin & Tự động Redirect Link Telegram
         async function handlePayment(e) {
             e.preventDefault();
-            document.getElementById('submit-btn').innerHTML = 'Đang gửi...';
+            
+            const teleInput = document.getElementById('user-tele').value.trim();
+            const fileInput = document.getElementById('bill-img').files[0];
+            
+            if(!teleInput || !fileInput) {
+                alert("⚠️ Bạn cần điền Tên Telegram và Tải ảnh Bill chuyển khoản trước khi ấn Xác nhận nhé!");
+                return;
+            }
+
+            const btn = document.getElementById('submit-btn');
+            btn.innerHTML = '<span class="loader border-white border-t-transparent w-4 h-4 mr-2"></span> Đang gửi...';
+            btn.disabled = true;
+
             const item = currentSelectedItem;
-            const f = document.getElementById('bill-img').files[0];
-            const r = new FileReader(); r.readAsDataURL(f);
+            const r = new FileReader(); 
+            r.readAsDataURL(fileInput);
+            
             r.onload = async () => {
-                await fetch(WEBHOOK_URL, { method: 'POST', body: JSON.stringify({ userTele: document.getElementById('user-tele').value, tenKhoa: item["Tên khóa"], soTien: isSaleValid(item) ? item["Giá Sale"] : item["Giá Gốc"], anhBase64: r.result, mimeType: f.type, tenFile: f.name }) });
-                alert("🎉 Đã gửi đơn thành công! Sunny sẽ sớm duyệt cho bạn nhé."); closePaymentModal(); document.getElementById('submit-btn').innerHTML = 'Gửi cho Sunny duyệt';
+                try {
+                    await fetch(WEBHOOK_URL, { 
+                        method: 'POST', 
+                        body: JSON.stringify({ 
+                            userTele: teleInput, 
+                            tenKhoa: item["Tên khóa"], 
+                            soTien: isSaleValid(item) ? item["Giá Sale"] : item["Giá Gốc"], 
+                            anhBase64: r.result, 
+                            mimeType: fileInput.type, 
+                            tenFile: fileInput.name 
+                        }) 
+                    });
+                    
+                    alert("🎉 Đã gửi đơn thành công! Hệ thống sẽ chuyển bạn tới nhóm Telegram của lớp học ngay bây giờ.");
+                    closePaymentModal(); 
+                    
+                    // Chuyển khách hàng sang nhóm Telegram sau khi tắt alert
+                    if(item["Link Telegram"]) {
+                        window.location.href = item["Link Telegram"];
+                    }
+                    
+                } catch(err) {
+                    alert("❌ Có lỗi kết nối. Bạn hãy chụp màn hình và gửi trực tiếp cho Admin nhé.");
+                } finally {
+                    btn.innerHTML = 'Xác nhận đã thanh toán & vào lớp';
+                    btn.disabled = false;
+                }
             };
         }
         loadData();
