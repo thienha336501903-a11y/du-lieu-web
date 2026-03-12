@@ -304,7 +304,6 @@
         function closePaymentModal() { document.getElementById('payment-modal').classList.add('hidden'); document.getElementById('payment-modal').classList.remove('flex'); }
         function changeTab(t) { currentTab = t; document.querySelectorAll('#tab-menu button').forEach(b => b.classList.remove('active-tab')); document.getElementById('tab-'+t).classList.add('active-tab'); document.getElementById('filter-bar').classList.toggle('hidden', !(t === 'all' || t === 'library')); render(); }
         
-        // Khôi phục Hàm chức năng lọc
         function filterSearch() { searchQuery = document.getElementById('search-input').value; render(); }
         function setCategory(cat) { currentCategory = cat; render(); }
 
@@ -318,6 +317,7 @@
             });
         }
 
+        // ĐÃ NÂNG CẤP HÀM NÀY ĐỂ BẮT LỖI TỪ GOOGLE SHEET VÀ CHẶN BÁO ẢO
         async function handlePayment(e) {
             e.preventDefault();
             
@@ -339,7 +339,7 @@
             
             r.onload = async () => {
                 try {
-                    await fetch(WEBHOOK_URL, { 
+                    const res = await fetch(WEBHOOK_URL, { 
                         method: 'POST', 
                         body: JSON.stringify({ 
                             userTele: teleInput, 
@@ -351,15 +351,23 @@
                         }) 
                     });
                     
-                    alert("🎉 Đã gửi đơn thành công! Hệ thống sẽ chuyển bạn tới nhóm Telegram của lớp học ngay bây giờ.");
-                    closePaymentModal(); 
+                    const data = await res.json(); // Đọc dữ liệu trả về từ Google Sheet
                     
-                    if(item["Link Telegram"]) {
-                        window.location.href = item["Link Telegram"];
+                    // Chỉ báo thành công khi Sheet thực sự lưu xong
+                    if (data.status === "success") {
+                        alert("🎉 Đã gửi đơn thành công! Hệ thống sẽ chuyển bạn tới nhóm Telegram của lớp học ngay bây giờ.");
+                        closePaymentModal(); 
+                        
+                        if(item["Link Telegram"]) {
+                            window.location.href = item["Link Telegram"];
+                        }
+                    } else {
+                        // Hiện thẳng lỗi nếu cấu hình Apps Script/Drive sai
+                        alert("❌ Có lỗi từ hệ thống: " + data.message);
                     }
                     
                 } catch(err) {
-                    alert("❌ Có lỗi kết nối. Bạn hãy chụp màn hình và gửi trực tiếp cho Admin nhé.");
+                    alert("❌ Lỗi kết nối. Vui lòng thử lại sau!");
                 } finally {
                     btn.innerHTML = 'Xác nhận đã thanh toán & vào lớp';
                     btn.disabled = false;
