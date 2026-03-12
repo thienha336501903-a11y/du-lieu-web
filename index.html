@@ -93,10 +93,12 @@
         let currentSelectedItem = null;
         let detailCountdownInterval, globalTimerInterval;
 
+        // ĐÃ FIX 100%: Dùng thẳng lh3.googleusercontent.com và thêm dấu $
         function formatDriveUrl(url) {
             if (!url || !url.includes("drive.google.com")) return url;
             let id = url.match(/[-\w]{25,}/);
-            return id ? `https://lh3.googleusercontent.com/d/$${id[0]}=w800` : url;
+            // Cú pháp chuẩn xác lấy ảnh chất lượng cao từ Drive không bị chặn
+            return id ? `https://lh3.googleusercontent.com/d/${id[0]}` : url;
         }
 
         function parseDateString(dateStr) {
@@ -275,18 +277,12 @@
         function closePaymentModal() { document.getElementById('payment-modal').classList.add('hidden'); document.getElementById('payment-modal').classList.remove('flex'); }
         function changeTab(t) { currentTab = t; document.querySelectorAll('#tab-menu button').forEach(b => b.classList.remove('active-tab')); document.getElementById('tab-'+t).classList.add('active-tab'); render(); }
         
-        // HÀM COPY STK
         function copySTK(stk) {
             navigator.clipboard.writeText(stk).then(() => {
                 alert("✅ Đã sao chép Số Tài Khoản: " + stk);
             }).catch(err => {
-                // Đề phòng trình duyệt cũ
                 const tempInput = document.createElement("input");
-                tempInput.value = stk;
-                document.body.appendChild(tempInput);
-                tempInput.select();
-                document.execCommand("copy");
-                document.body.removeChild(tempInput);
+                tempInput.value = stk; document.body.appendChild(tempInput); tempInput.select(); document.execCommand("copy"); document.body.removeChild(tempInput);
                 alert("✅ Đã sao chép Số Tài Khoản: " + stk);
             });
         }
