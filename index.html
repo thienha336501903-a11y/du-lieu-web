@@ -12,12 +12,11 @@
         .sale-badge { background-color: #ff4d6d; color: white; font-size: 10px; padding: 3px 8px; border-radius: 999px; position: absolute; top: 10px; left: 10px; font-weight: bold; text-transform: uppercase; box-shadow: 0 2px 4px rgba(255,77,109,0.3); }
         .price-sale { color: #ff4d6d; font-weight: 800; font-size: 18px; }
         .price-old { text-decoration: line-through; color: #a1a1aa; font-size: 13px; margin-left: 6px; font-weight: 600; }
-        .overlay { background-color: rgba(0,0,0,0.6); backdrop-filter: blur(2px); display: none; }
+        .overlay { background-color: rgba(0,0,0,0.6); backdrop-filter: blur(2px); }
         .loader { border: 3px solid #f3f3f3; border-top: 3px solid #ff4d6d; border-radius: 50%; width: 20px; height: 20px; animation: spin 1s linear infinite; display: inline-block; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
         button { transition: all 0.2s ease; }
         button:active { transform: scale(0.96); }
-        /* Tùy chỉnh thanh cuộn cho phần nội dung */
         .custom-scrollbar::-webkit-scrollbar { width: 4px; }
         .custom-scrollbar::-webkit-scrollbar-track { background: #f1f1f1; }
         .custom-scrollbar::-webkit-scrollbar-thumb { background: #ffb3c1; border-radius: 4px; }
@@ -57,7 +56,7 @@
         <button onclick="changeTab('library')" class="text-gray-400 flex flex-col items-center text-[10px] font-extrabold">📖<span class="mt-1">Thư viện</span></button>
     </nav>
 
-    <div id="detail-modal" class="overlay fixed inset-0 z-50 flex items-center justify-center p-4">
+    <div id="detail-modal" class="overlay fixed inset-0 z-50 hidden items-center justify-center p-4">
         <div class="bg-white rounded-[24px] w-full max-w-sm overflow-hidden relative shadow-2xl flex flex-col max-h-[90vh]">
             <button onclick="closeDetailModal()" class="absolute top-3 right-3 bg-black/40 text-white w-8 h-8 rounded-full flex items-center justify-center z-10 hover:bg-black/60">✕</button>
             
@@ -88,7 +87,7 @@
         </div>
     </div>
 
-    <div id="payment-modal" class="overlay fixed inset-0 z-[60] flex items-center justify-center p-4">
+    <div id="payment-modal" class="overlay fixed inset-0 z-[60] hidden items-center justify-center p-4">
         <div class="bg-white rounded-[24px] w-full max-w-sm overflow-hidden relative p-6 max-h-[95vh] overflow-y-auto shadow-2xl">
             <button onclick="closePaymentModal()" class="absolute top-3 right-3 text-gray-400 text-xl font-bold p-2">✕</button>
             
@@ -120,7 +119,7 @@
         let currentTab = 'hot';
         let currentCategory = 'All';
         let searchQuery = '';
-        let currentSelectedItem = null; // Lưu khóa học đang chọn
+        let currentSelectedItem = null;
         let countdownInterval;
 
         function formatDriveUrl(url) {
@@ -130,7 +129,6 @@
             return url;
         }
 
-        // Hàm chuyển đổi chuỗi ngày "HH:mm dd/MM/yyyy" thành Object Date
         function parseDateString(dateStr) {
             if(!dateStr) return null;
             try {
@@ -200,19 +198,16 @@
             });
         }
 
-        // --- HÀM 1: MỞ GIAO DIỆN CHI TIẾT (Trang đích thu nhỏ) ---
         function openDetailModal(item) {
-            currentSelectedItem = item; // Lưu lại để dùng cho thanh toán
+            currentSelectedItem = item;
             const modal = document.getElementById('detail-modal');
             
-            // Điền thông tin cơ bản
             document.getElementById('detail-img').src = formatDriveUrl(item["Ảnh bìa"] || item["Ảnh"]);
             document.getElementById('detail-title').innerText = item["Tên khóa"] || item["Tên món"];
             document.getElementById('detail-subtitle').innerText = item["Phân loại"] ? `Phân loại: ${item["Phân loại"]}` : "Tự tay làm bánh ngon tại nhà!";
             document.getElementById('detail-price-sale').innerText = item["Giá Sale"] || item["Giá Gốc"] || "Miễn phí";
             document.getElementById('detail-price-old').innerText = (item["Giá Sale"] && item["Giá Sale"] !== item["Giá Gốc"]) ? item["Giá Gốc"] : "";
 
-            // Xử lý đếm ngược (Cột Kết thúc Sale)
             clearInterval(countdownInterval);
             const bannerEl = document.getElementById('sale-countdown-banner');
             const timerEl = document.getElementById('countdown-timer');
@@ -237,14 +232,11 @@
                 bannerEl.classList.add('hidden');
             }
 
-            // Xử lý nội dung .txt (Tự động thêm dấu tick ✔️ xanh)
             let contentHtml = "";
             let rawContent = item["NoiDungChiTiet"];
             if (rawContent && rawContent !== "Không tìm thấy nội dung file mô tả.") {
-                // Tách theo dòng, bỏ dòng trống
                 const lines = rawContent.split('\n').filter(line => line.trim() !== '');
                 contentHtml = lines.map(line => {
-                    // Xóa các dấu -, +, * ở đầu dòng để thay bằng dấu tick cho đẹp
                     let cleanLine = line.replace(/^[-+*]\s*/, '').trim();
                     return `<div class="flex items-start mb-1.5"><span class="text-blue-600 mr-2 font-bold">✔️</span> <span class="font-medium">${cleanLine}</span></div>`;
                 }).join('');
@@ -253,17 +245,20 @@
             }
             document.getElementById('detail-content').innerHTML = contentHtml;
 
-            modal.style.display = 'flex';
+            // Xóa class hidden và hiển thị dạng flex
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
         }
 
         function closeDetailModal() { 
-            document.getElementById('detail-modal').style.display = 'none'; 
+            const modal = document.getElementById('detail-modal');
+            modal.classList.remove('flex');
+            modal.classList.add('hidden');
             clearInterval(countdownInterval);
         }
 
-        // --- HÀM 2: MỞ GIAO DIỆN THANH TOÁN ---
         function openPaymentModal() {
-            closeDetailModal(); // Đóng bảng chi tiết
+            closeDetailModal(); 
             const item = currentSelectedItem;
             const modal = document.getElementById('payment-modal');
             const info = document.getElementById('payment-info');
@@ -280,12 +275,18 @@
                     <p class="text-[10px] text-gray-500 italic mt-2 border-t pt-2">Nội dung CK: Tên Tele + ${item["ID"] || ""}</p>
                 </div>
             `;
-            modal.style.display = 'flex';
+            
+            // Xóa class hidden và hiển thị dạng flex
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
         }
 
-        function closePaymentModal() { document.getElementById('payment-modal').style.display = 'none'; }
+        function closePaymentModal() { 
+            const modal = document.getElementById('payment-modal');
+            modal.classList.remove('flex');
+            modal.classList.add('hidden');
+        }
 
-        // CÁC HÀM CƠ BẢN KHÁC
         function changeTab(tab) {
             currentTab = tab;
             document.querySelectorAll('#tab-menu button').forEach(b => b.classList.remove('active-tab'));
@@ -296,7 +297,6 @@
         function filterSearch() { searchQuery = document.getElementById('search-input').value; render(); }
         function setCategory(cat) { currentCategory = cat; render(); }
 
-        // HÀM GỬI ĐƠN HÀNG
         async function handlePayment(e) {
             e.preventDefault();
             const btn = document.getElementById('submit-btn');
