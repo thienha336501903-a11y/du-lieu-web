@@ -85,12 +85,12 @@
             
             <form id="payment-form" onsubmit="handlePayment(event)" class="space-y-4">
                 <div class="bg-blue-50/50 p-3 rounded-xl border border-blue-100">
-                    <label class="block text-[12px] font-extrabold text-blue-800 mb-2">1. Điền tên Nick Telegram của bạn để Admin duyệt vào nhóm học:</label>
-                    <input type="text" id="user-tele" required placeholder="Ví dụ: @hoahong..." class="w-full border-2 border-blue-200 p-3 rounded-xl outline-none font-semibold text-sm focus:border-blue-400 transition-colors">
+                    <label class="block text-[12px] font-extrabold text-blue-800 mb-2">1. Điền tên nick telegram của bạn để duyệt vào nhóm học:</label>
+                    <input type="text" id="user-tele" required placeholder="Tên nick Telegram" class="w-full border-2 border-blue-200 p-3 rounded-xl outline-none font-semibold text-sm focus:border-blue-400 transition-colors">
                 </div>
                 
                 <div class="bg-yellow-50 p-3 rounded-xl border-2 border-dashed border-yellow-400">
-                    <label class="block text-[12px] font-extrabold text-red-600 mb-2">2. Ấn "Chọn tệp" để tải ảnh bill chuyển khoản thành công để Admin duyệt:</label>
+                    <label class="block text-[12px] font-extrabold text-red-600 mb-2">2. Ấn chọn tệp để tải ảnh bill chuyển khoản thành công gửi Admin:</label>
                     <input type="file" id="bill-img" accept="image/*" required class="w-full text-xs file:bg-red-500 file:text-white file:border-0 file:rounded-lg file:px-4 file:py-2.5 file:font-bold file:cursor-pointer hover:file:bg-red-600 file:mr-3 transition-colors">
                 </div>
                 
@@ -108,8 +108,8 @@
 
         let db = { khoa_hoc: [], thu_vien: [] };
         let currentTab = 'hot';
-        let currentCategory = 'All'; // Biến cần cho lọc
-        let searchQuery = ''; // Biến cần cho tìm kiếm
+        let currentCategory = 'All'; 
+        let searchQuery = ''; 
         let currentSelectedItem = null;
         let detailCountdownInterval, globalTimerInterval;
 
@@ -255,7 +255,6 @@
             const price = activeSale ? item["Giá Sale"] : (item["Giá Gốc"] || "0đ");
             const qrLink = formatDriveUrl(item["QR Ngân hàng"]);
 
-            // (Yêu cầu 2): Sửa nội dung Tên FB/Zalo thay vì Tên Tele
             document.getElementById('payment-info').innerHTML = `
                 <div class="text-center mb-3">
                     <p class="font-extrabold text-sm mb-3 text-gray-700">Khóa học: <span class="text-pink-500">${item["Tên khóa"]}</span></p>
@@ -293,7 +292,7 @@
                     <div class="mt-3 bg-yellow-50 border border-yellow-200 p-2.5 rounded-xl text-center">
                         <p class="text-[11px] text-yellow-800 font-semibold mb-1">✏️ Copy nội dung chuyển khoản bên dưới:</p>
                         <div class="flex items-center justify-center gap-2">
-                            <strong class="text-red-500 text-sm select-all">Tên FB hoặc Zalo của Bạn + ${item["ID"]}</strong>
+                            <strong class="text-red-500 text-sm select-all">Tên FB hoặc Zalo của bạn</strong>
                         </div>
                     </div>
                 </div>
@@ -305,7 +304,7 @@
         function closePaymentModal() { document.getElementById('payment-modal').classList.add('hidden'); document.getElementById('payment-modal').classList.remove('flex'); }
         function changeTab(t) { currentTab = t; document.querySelectorAll('#tab-menu button').forEach(b => b.classList.remove('active-tab')); document.getElementById('tab-'+t).classList.add('active-tab'); document.getElementById('filter-bar').classList.toggle('hidden', !(t === 'all' || t === 'library')); render(); }
         
-        // (Yêu cầu 1): Hàm hỗ trợ thanh Lọc
+        // Khôi phục Hàm chức năng lọc
         function filterSearch() { searchQuery = document.getElementById('search-input').value; render(); }
         function setCategory(cat) { currentCategory = cat; render(); }
 
@@ -319,7 +318,6 @@
             });
         }
 
-        // (Yêu cầu 6, 7): Cảnh báo thiếu thông tin & Tự động Redirect Link Telegram
         async function handlePayment(e) {
             e.preventDefault();
             
@@ -332,7 +330,7 @@
             }
 
             const btn = document.getElementById('submit-btn');
-            btn.innerHTML = '<span class="loader border-white border-t-transparent w-4 h-4 mr-2"></span> Đang gửi...';
+            btn.innerHTML = '<span class="loader border-white border-t-transparent w-4 h-4 mr-2"></span> Đang xử lý...';
             btn.disabled = true;
 
             const item = currentSelectedItem;
@@ -356,7 +354,6 @@
                     alert("🎉 Đã gửi đơn thành công! Hệ thống sẽ chuyển bạn tới nhóm Telegram của lớp học ngay bây giờ.");
                     closePaymentModal(); 
                     
-                    // Chuyển khách hàng sang nhóm Telegram sau khi tắt alert
                     if(item["Link Telegram"]) {
                         window.location.href = item["Link Telegram"];
                     }
