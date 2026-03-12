@@ -3,75 +3,80 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bếp Bánh Sunny - Khoá Học Online</title>
+    <title>Khoá Học Sunny - Giao Diện Mới Tinh Tế</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;600;700&display=swap" rel="stylesheet">
     <style>
-        body { font-family: 'Quicksand', sans-serif; background-color: #fff5f7; }
+        body { font-family: 'Quicksand', sans-serif; background-color: #fffafc; }
         .active-tab { border-bottom: 3px solid #ff4d6d; color: #ff4d6d; font-weight: bold; }
-        .card-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; padding: 12px; }
-        .sale-badge { background: linear-gradient(45deg, #ff4d6d, #ff758c); color: white; font-size: 10px; padding: 2px 6px; border-radius: 4px; position: absolute; top: 8px; left: 8px; }
-        .price-sale { color: #ff4d6d; font-weight: bold; font-size: 16px; }
-        .price-old { text-decoration: line-through; color: #999; font-size: 12px; }
-        #modal-overlay { background: rgba(0,0,0,0.6); display: none; }
+        .sale-badge { background-color: #ff4d6d; color: white; font-size: 10px; padding: 2px 7px; border-radius: 999px; position: absolute; top: 12px; left: 12px; font-weight: bold; text-transform: uppercase; }
+        .price-sale { color: #ff4d6d; font-weight: bold; font-size: 18px; }
+        .price-old { text-decoration: line-through; color: #aaa; font-size: 12px; }
+        #modal-overlay { background-color: rgba(0,0,0,0.6); display: none; }
         .loader { border: 3px solid #f3f3f3; border-top: 3px solid #ff4d6d; border-radius: 50%; width: 20px; height: 20px; animation: spin 1s linear infinite; display: inline-block; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        /* Tối ưu hiệu ứng hover cho nút */
+        button { transition: all 0.2s ease-in-out; }
+        button:active { scale: 0.96; }
     </style>
 </head>
 <body>
 
-    <header class="bg-white shadow-sm sticky top-0 z-50">
-        <div class="p-4 text-center">
-            <h1 class="text-2xl font-bold text-pink-500">Bếp Bánh Sunny</h1>
-            <p class="text-gray-500 text-sm">Học nấu ăn - Khởi nghiệp cùng đam mê</p>
+    <header class="bg-white shadow-sm sticky top-0 z-50 rounded-b-3xl">
+        <div class="p-6 text-center">
+            <h1 class="text-3xl font-extrabold text-pink-600 uppercase tracking-wide">Khoá Học Sunny</h1>
+            <p class="text-gray-500 text-sm mt-1">Học nấu ăn - Khởi nghiệp cùng đam mê</p>
         </div>
-        <div class="flex justify-around border-t overflow-x-auto bg-white" id="tab-menu">
-            <button onclick="changeTab('hot')" id="tab-hot" class="py-3 px-2 active-tab">🔥 Khóa Hot</button>
-            <button onclick="changeTab('sale')" id="tab-sale" class="py-3 px-2">⏳ Giảm Giá</button>
-            <button onclick="changeTab('all')" id="tab-all" class="py-3 px-2">📚 Tất Cả</button>
+        <div class="flex justify-around border-t overflow-x-auto bg-white px-2 rounded-b-3xl" id="tab-menu">
+            <button onclick="changeTab('hot')" id="tab-hot" class="py-4 px-3 active-tab text-gray-700">🔥 Khóa Hot</button>
+            <button onclick="changeTab('sale')" id="tab-sale" class="py-4 px-3 text-gray-700">⏳ Giảm Giá</button>
+            <button onclick="changeTab('all')" id="tab-all" class="py-4 px-3 text-gray-700">📚 Tất Cả</button>
         </div>
     </header>
 
-    <div id="filter-bar" class="p-3 hidden">
-        <input type="text" id="search-input" oninput="filterSearch()" placeholder="Tìm món ăn..." class="w-full p-2 border rounded-full mb-2 outline-none border-pink-200">
+    <div id="filter-bar" class="p-5 hidden">
+        <div class="relative mb-4 flex items-center bg-white border-2 border-pink-200 rounded-full shadow-inner px-4">
+            <span class="text-pink-400">🔍</span>
+            <input type="text" id="search-input" oninput="filterSearch()" placeholder="Tìm khóa học..." class="w-full p-3 outline-none bg-transparent placeholder-gray-300 text-sm">
+        </div>
         <div class="flex gap-2 overflow-x-auto pb-2">
-            <button onclick="setCategory('All')" class="bg-white border px-4 py-1 rounded-full text-sm">Tất cả</button>
-            <button onclick="setCategory('Bánh')" class="bg-white border px-4 py-1 rounded-full text-sm">🍩 Bánh</button>
-            <button onclick="setCategory('Chè')" class="bg-white border px-4 py-1 rounded-full text-sm">🍧 Chè</button>
-            <button onclick="setCategory('Đồ mặn')" class="bg-white border px-4 py-1 rounded-full text-sm">🍗 Đồ mặn</button>
+            <button onclick="setCategory('All')" class="bg-white border px-5 py-2 rounded-full text-sm text-gray-700 whitespace-nowrap active:bg-pink-50">Tất cả</button>
+            <button onclick="setCategory('Bánh')" class="bg-white border px-5 py-2 rounded-full text-sm text-gray-700 whitespace-nowrap">🍩 Bánh</button>
+            <button onclick="setCategory('Chè')" class="bg-white border px-5 py-2 rounded-full text-sm text-gray-700 whitespace-nowrap">🍧 Chè</button>
+            <button onclick="setCategory('Đồ mặn')" class="bg-white border px-5 py-2 rounded-full text-sm text-gray-700 whitespace-nowrap">🍗 Đồ mặn</button>
         </div>
     </div>
 
-    <main id="content-grid" class="card-grid mb-20"></main>
+    <main id="content-grid" class="grid grid-cols-2 md:grid-cols-3 gap-8 px-6 py-8 mb-24"></main>
 
-    <nav class="fixed bottom-0 left-0 right-0 bg-white border-t flex justify-around p-3 z-50">
-        <button onclick="location.reload()" class="text-pink-500 flex flex-col items-center text-xs">🏠<span>Trang chủ</span></button>
-        <button onclick="changeTab('library')" class="text-gray-500 flex flex-col items-center text-xs">📖<span>Thư viện</span></button>
+    <nav class="fixed bottom-0 left-0 right-0 bg-white border-t-2 border-pink-100 flex justify-around p-4 z-50 rounded-t-3xl shadow-lg">
+        <button onclick="location.reload()" class="text-pink-500 flex flex-col items-center text-[10px] font-bold">🏠<span class="mt-1">Trang chủ</span></button>
+        <button onclick="changeTab('library')" class="text-gray-500 flex flex-col items-center text-[10px] font-bold लाइब्रेरी"><span class="mt-1">Thư viện</span></button>
     </nav>
 
-    <div id="modal-overlay" class="fixed inset-0 z-[60] flex items-center justify-center p-4">
-        <div class="bg-white rounded-2xl w-full max-w-md overflow-hidden relative p-5 max-h-[90vh] overflow-y-auto">
-            <h2 class="text-lg font-bold mb-4 text-center text-pink-600">ĐĂNG KÝ KHÓA HỌC</h2>
-            <div id="payment-info" class="text-sm space-y-2 mb-4 bg-gray-50 p-3 rounded-lg"></div>
+    <div id="modal-overlay" class="fixed inset-0 z-[60] flex items-center justify-center p-5">
+        <div class="bg-white rounded-3xl w-full max-w-md overflow-hidden relative p-6 max-h-[95vh] overflow-y-auto shadow-2xl">
+            <h2 class="text-xl font-extrabold mb-5 text-center text-pink-600 uppercase tracking-wider">ĐĂNG KÝ KHÓA HỌC</h2>
+            <div id="payment-info" class="text-sm space-y-3 mb-5 p-4 bg-white border border-pink-100 rounded-3xl shadow-inner"></div>
             
-            <form id="payment-form" onsubmit="handlePayment(event)" class="space-y-3">
+            <form id="payment-form" onsubmit="handlePayment(event)" class="space-y-4">
                 <input type="hidden" id="form-ten-khoa">
                 <input type="hidden" id="form-so-tien">
                 
                 <div>
-                    <label class="block text-xs font-semibold mb-1">Username Telegram của bạn:</label>
-                    <input type="text" id="user-tele" required placeholder="@username" class="w-full border p-2 rounded-lg outline-none focus:border-pink-400">
+                    <label class="block text-xs font-semibold mb-1 text-gray-700">Username Telegram của bạn:</label>
+                    <input type="text" id="user-tele" required placeholder="@username" class="w-full border-2 border-gray-100 p-3 rounded-full outline-none focus:border-pink-300">
                 </div>
                 
                 <div>
                     <label class="block text-xs font-semibold mb-1 text-red-500">Tải ảnh Bill chuyển khoản:</label>
-                    <input type="file" id="bill-img" accept="image/*" required class="w-full text-sm">
+                    <input type="file" id="bill-img" accept="image/*" required class="w-full text-xs text-gray-500 file:bg-pink-50 file:border file:border-pink-100 file:rounded-full file:px-4 file:py-2 file:text-pink-500 file:text-xs">
                 </div>
 
                 <input type="text" name="hp_field" style="display:none !important" tabindex="-1">
 
-                <button type="submit" id="submit-btn" class="w-full bg-pink-500 text-white py-3 rounded-xl font-bold shadow-lg shadow-pink-200 uppercase tracking-wider">Gửi đơn duyệt ngay</button>
-                <button type="button" onclick="closeModal()" class="w-full text-gray-400 text-sm mt-2 text-center underline">Đóng lại</button>
+                <button type="submit" id="submit-btn" class="w-full bg-pink-500 text-white py-4 rounded-full font-bold shadow-lg shadow-pink-200 uppercase tracking-wider text-sm active:scale-95 transition-all">Gửi yêu cầu duyệt ngay</button>
+                <button type="button" onclick="closeModal()" class="w-full text-gray-400 text-sm mt-2 text-center underline font-semibold">Để sau</button>
             </form>
         </div>
     </div>
@@ -85,26 +90,24 @@
         let currentCategory = 'All';
         let searchQuery = '';
 
-        // Hàm xử lý link Google Drive để vượt rào hiển thị
         function formatDriveUrl(url) {
             if (!url || !url.includes("drive.google.com")) return url;
             const idMatch = url.match(/[-\w]{25,}/);
             if (idMatch) {
-                // Sử dụng Proxy hình ảnh của Google để load nhanh và không bị chặn
-                return `https://lh3.googleusercontent.com/d/${idMatch[0]}=w800`;
+                return `https://lh3.googleusercontent.com/d/${idMatch[0]}=w600`;
             }
             return url;
         }
 
         async function loadData() {
             const grid = document.getElementById('content-grid');
-            grid.innerHTML = '<div class="col-span-2 text-center py-10"><span class="loader"></span> Đang tải khóa học...</div>';
+            grid.innerHTML = '<div class="col-span-2 md:col-span-3 text-center py-10"><span class="loader"></span> Đang tải khóa học...</div>';
             try {
                 const res = await fetch(DATA_URL + "?v=" + new Date().getTime());
                 db = await res.json();
                 render();
             } catch (e) { 
-                grid.innerHTML = '<div class="col-span-2 text-center text-red-500 font-bold">Lỗi kết nối dữ liệu! Thử tải lại trang.</div>';
+                grid.innerHTML = '<div class="col-span-2 md:col-span-3 text-center text-red-500 font-bold">Lỗi kết nối dữ liệu! Thử tải lại trang.</div>';
             }
         }
 
@@ -131,33 +134,32 @@
             }
 
             if (list.length === 0) {
-                grid.innerHTML = '<div class="col-span-2 text-center py-10 text-gray-400">Chưa có món nào mục này bạn ơi!</div>';
+                grid.innerHTML = '<div class="col-span-2 md:col-span-3 text-center py-10 text-gray-400">Chưa có món nào mục này bạn ơi!</div>';
                 return;
             }
 
             list.forEach(item => {
                 const card = document.createElement('div');
-                card.className = "bg-white rounded-xl shadow-sm overflow-hidden relative flex flex-col border border-pink-50";
+                card.className = "bg-white rounded-3xl shadow-lg overflow-hidden relative flex flex-col border border-pink-50 hover:shadow-xl transition-all";
                 
-                // Áp dụng formatDriveUrl cho ảnh bìa
                 const imgLink = formatDriveUrl(item["Ảnh bìa"] || item["Ảnh"]);
                 const isSale = item["Giá Sale"] && item["Giá Sale"] !== item["Giá Gốc"];
                 
                 card.innerHTML = `
-                    <div class="relative h-36 bg-gray-50">
-                        <img src="${imgLink}" class="w-full h-full object-cover" loading="lazy" onerror="this.src='https://via.placeholder.com/300x200?text=Sunny+Bakery'">
-                        ${isSale ? `<div class="sale-badge uppercase font-bold">SALE</div>` : ''}
+                    <div class="relative h-40 bg-gray-50 rounded-t-3xl">
+                        <img src="${imgLink}" class="w-full h-full object-cover rounded-t-3xl" loading="lazy" onerror="this.src='https://via.placeholder.com/400x300?text=SUNNY'">
+                        ${isSale ? `<div class="sale-badge">GIẢM GIÁ</div>` : ''}
                     </div>
-                    <div class="p-2 flex flex-col flex-grow">
-                        <h3 class="font-bold text-[13px] h-9 line-clamp-2 text-gray-800 leading-tight">${item["Tên khóa"] || item["Tên món"]}</h3>
-                        <div class="mt-auto pt-2">
+                    <div class="p-6 flex flex-col flex-grow">
+                        <h3 class="font-bold text-base h-9 line-clamp-2 text-gray-900 leading-tight">${item["Tên khóa"] || item["Tên món"]}</h3>
+                        <div class="mt-auto pt-3">
                             ${item["Giá Sale"] ? `
-                                <div class="mb-1">
-                                    <p class="price-sale text-sm leading-none">${item["Giá Sale"]}</p>
-                                    <p class="price-old text-[10px] leading-none mt-1">${item["Giá Gốc"]}</p>
+                                <div class="mb-2">
+                                    <p class="price-sale">${item["Giá Sale"]}</p>
+                                    <p class="price-old leading-none mt-1">${item["Giá Gốc"]}</p>
                                 </div>
-                            ` : `<p class="text-[11px] text-pink-400 font-bold mb-1">${item["Phân loại"] || "Học Online"}</p>`}
-                            <button onclick='showDetail(${JSON.stringify(item)})' class="w-full py-2 bg-pink-500 text-white rounded-lg text-[11px] font-bold shadow-sm active:scale-95 transition-transform uppercase">Xem & Đăng ký</button>
+                            ` : `<p class="text-[12px] text-pink-400 font-bold mb-2">${item["Phân loại"] || "Học Online"}</p>`}
+                            <button onclick='showDetail(${JSON.stringify(item)})' class="w-full py-3 bg-pink-500 text-white rounded-full text-[11px] font-bold shadow-md uppercase active:scale-95 transition-all">Xem chi tiết</button>
                         </div>
                     </div>
                 `;
@@ -187,21 +189,20 @@
             document.getElementById('form-ten-khoa').value = item["Tên khóa"] || item["Tên món"];
             document.getElementById('form-so-tien').value = item["Giá Sale"] || item["Giá Gốc"] || "0";
 
-            // Áp dụng formatDriveUrl cho QR Ngân hàng
             const qrLink = formatDriveUrl(item["QR Ngân hàng"]);
 
             info.innerHTML = `
-                <div class="text-center mb-4">
-                    <p class="text-pink-600 font-bold text-lg leading-tight uppercase mb-2">${item["Tên khóa"] || item["Tên món"]}</p>
-                    ${qrLink ? `<img src="${qrLink}" class="w-48 h-48 mx-auto border-2 border-pink-100 rounded-xl shadow-sm" onerror="this.style.display='none'">` : ''}
+                <div class="text-center mb-5">
+                    <p class="text-pink-600 font-extrabold text-xl leading-tight uppercase mb-3">${item["Tên khóa"] || item["Tên món"]}</p>
+                    ${qrLink ? `<img src="${qrLink}" class="w-56 h-56 mx-auto border-4 border-pink-100 rounded-3xl shadow-md" onerror="this.style.display='none'">` : ''}
                 </div>
-                <div class="space-y-1 text-[13px] bg-white border border-pink-100 p-3 rounded-xl shadow-inner">
+                <div class="space-y-1.5 text-[13px] bg-gray-50 border border-gray-100 p-4 rounded-2xl">
                     <p><b>Giá bán:</b> <span class="text-red-500 font-bold">${item["Giá Sale"] || item["Giá Gốc"] || "Miễn phí"}</span></p>
                     <p><b>Ngân hàng:</b> ${item["Ngân hàng"] || "Chưa cập nhật"}</p>
                     <p><b>Số tài khoản:</b> <span class="text-blue-600 font-bold select-all">${item["STK"] || ""}</span></p>
                     <p><b>Chủ tài khoản:</b> ${item["Chủ TK"] || ""}</p>
                 </div>
-                <p class="mt-3 text-[11px] text-gray-500 italic text-center">Nội dung chuyển khoản: ${item["ID"] || "Chuyển khoản học bánh"}</p>
+                <p class="mt-4 text-[11px] text-gray-500 italic text-center">Nội dung chuyển khoản: ${item["ID"] || "Chuyển khoản học bánh"}</p>
             `;
             modal.style.display = 'flex';
         }
