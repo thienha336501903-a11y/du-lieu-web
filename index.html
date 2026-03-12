@@ -3,58 +3,38 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Khoá Học Sunny - Khởi Nghiệp Cùng Đam Mê</title>
+    <title>Khoá Học Sunny</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;600;700;800&display=swap" rel="stylesheet">
     <style>
         body { font-family: 'Quicksand', sans-serif; background-color: #f3f4f6; }
         .active-tab { border-bottom: 3px solid #ff4d6d; color: #ff4d6d; font-weight: 800; }
-        .sale-badge { background-color: #ff4d6d; color: white; font-size: 10px; padding: 3px 8px; border-radius: 999px; position: absolute; top: 10px; left: 10px; font-weight: bold; text-transform: uppercase; box-shadow: 0 2px 4px rgba(255,77,109,0.3); z-index: 10; }
-        /* Style cho đồng hồ ngoài trang chủ */
-        .timer-badge { background: linear-gradient(90deg, #ff9a9e 0%, #fecfef 99%, #fecfef 100%); color: #d81159; font-size: 10px; padding: 4px 8px; border-bottom-left-radius: 16px; border-top-right-radius: 24px; position: absolute; top: 0; right: 0; font-weight: 800; z-index: 10; box-shadow: -2px 2px 4px rgba(0,0,0,0.05); display: none; }
-        
+        .sale-badge { background-color: #ff4d6d; color: white; font-size: 10px; padding: 3px 8px; border-radius: 999px; position: absolute; top: 10px; left: 10px; font-weight: bold; text-transform: uppercase; z-index: 10; }
+        .timer-badge { background: linear-gradient(90deg, #ff9a9e 0%, #fecfef 99%, #fecfef 100%); color: #d81159; font-size: 10px; padding: 4px 8px; border-bottom-left-radius: 16px; border-top-right-radius: 24px; position: absolute; top: 0; right: 0; font-weight: 800; z-index: 10; display: none; }
         .price-sale { color: #ff4d6d; font-weight: 800; font-size: 18px; }
         .price-old { text-decoration: line-through; color: #a1a1aa; font-size: 13px; margin-left: 6px; font-weight: 600; }
         .overlay { background-color: rgba(0,0,0,0.6); backdrop-filter: blur(2px); }
         .loader { border: 3px solid #f3f3f3; border-top: 3px solid #ff4d6d; border-radius: 50%; width: 20px; height: 20px; animation: spin 1s linear infinite; display: inline-block; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-        button { transition: all 0.2s ease; }
         button:active { transform: scale(0.96); }
-        .custom-scrollbar::-webkit-scrollbar { width: 4px; }
-        .custom-scrollbar::-webkit-scrollbar-track { background: #f1f1f1; }
-        .custom-scrollbar::-webkit-scrollbar-thumb { background: #ffb3c1; border-radius: 4px; }
     </style>
 </head>
 <body class="pb-20">
 
     <header class="bg-white shadow-sm sticky top-0 z-40 rounded-b-3xl">
         <div class="p-5 text-center">
-            <h1 class="text-2xl font-extrabold text-pink-500 uppercase tracking-wider">Khoá Học Sunny</h1>
-            <p class="text-gray-500 text-xs mt-1 font-semibold">Tự tay làm bánh thơm lừng tại nhà</p>
+            <h1 class="text-2xl font-extrabold text-pink-500 uppercase">Khoá Học Sunny</h1>
         </div>
-        <div class="flex justify-around border-t overflow-x-auto bg-white px-2 rounded-b-3xl" id="tab-menu">
-            <button onclick="changeTab('hot')" id="tab-hot" class="py-3 px-3 active-tab text-gray-600 font-semibold text-sm whitespace-nowrap">🔥 Khóa Hot</button>
-            <button onclick="changeTab('sale')" id="tab-sale" class="py-3 px-3 text-gray-600 font-semibold text-sm whitespace-nowrap">⏳ Giảm Giá</button>
-            <button onclick="changeTab('all')" id="tab-all" class="py-3 px-3 text-gray-600 font-semibold text-sm whitespace-nowrap">📚 Tất Cả</button>
+        <div class="flex justify-around border-t bg-white px-2 rounded-b-3xl" id="tab-menu">
+            <button onclick="changeTab('hot')" id="tab-hot" class="py-3 px-3 active-tab text-gray-600 font-semibold text-sm">🔥 Khóa Hot</button>
+            <button onclick="changeTab('sale')" id="tab-sale" class="py-3 px-3 text-gray-600 font-semibold text-sm">⏳ Giảm Giá</button>
+            <button onclick="changeTab('all')" id="tab-all" class="py-3 px-3 text-gray-600 font-semibold text-sm">📚 Tất Cả</button>
         </div>
     </header>
 
-    <div id="filter-bar" class="p-4 hidden">
-        <div class="relative mb-3 flex items-center bg-white border border-pink-200 rounded-full shadow-sm px-4">
-            <span class="text-pink-400 text-lg">🔍</span>
-            <input type="text" id="search-input" oninput="filterSearch()" placeholder="Tìm khóa học bạn muốn..." class="w-full p-2.5 outline-none bg-transparent placeholder-gray-400 text-sm font-semibold">
-        </div>
-        <div class="flex gap-2 overflow-x-auto pb-1 scrollbar-hide">
-            <button onclick="setCategory('All')" class="bg-white border border-gray-200 px-4 py-1.5 rounded-full text-xs font-bold text-gray-600 whitespace-nowrap active:bg-pink-50">Tất cả</button>
-            <button onclick="setCategory('Bánh')" class="bg-white border border-gray-200 px-4 py-1.5 rounded-full text-xs font-bold text-gray-600 whitespace-nowrap">🍩 Bánh</button>
-            <button onclick="setCategory('Chè')" class="bg-white border border-gray-200 px-4 py-1.5 rounded-full text-xs font-bold text-gray-600 whitespace-nowrap">🍧 Chè</button>
-            <button onclick="setCategory('Đồ mặn')" class="bg-white border border-gray-200 px-4 py-1.5 rounded-full text-xs font-bold text-gray-600 whitespace-nowrap">🍗 Đồ mặn</button>
-        </div>
-    </div>
-
     <main id="content-grid" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 px-4 py-6"></main>
 
-    <nav class="fixed bottom-0 left-0 right-0 bg-white border-t border-pink-100 flex justify-around p-3 z-40 rounded-t-3xl shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)]">
+    <nav class="fixed bottom-0 left-0 right-0 bg-white border-t flex justify-around p-3 z-40 rounded-t-3xl shadow-lg">
         <button onclick="location.reload()" class="text-pink-500 flex flex-col items-center text-[10px] font-extrabold">🏠<span class="mt-1">Trang chủ</span></button>
         <button onclick="changeTab('library')" class="text-gray-400 flex flex-col items-center text-[10px] font-extrabold">📖<span class="mt-1">Thư viện</span></button>
     </nav>
@@ -67,7 +47,6 @@
             </div>
             <div class="p-5 flex flex-col flex-grow overflow-hidden">
                 <h2 id="detail-title" class="text-xl font-extrabold text-center text-gray-800 leading-tight"></h2>
-                <p id="detail-subtitle" class="text-center text-[11px] text-gray-500 font-semibold mt-1"></p>
                 <div class="text-center mt-3 mb-3">
                     <span id="detail-price-sale" class="price-sale text-2xl"></span>
                     <span id="detail-price-old" class="price-old"></span>
@@ -75,30 +54,24 @@
                 <div id="sale-countdown-banner" class="bg-yellow-50 border border-yellow-200 text-yellow-700 text-center py-1.5 rounded-lg text-[11px] font-bold mb-4 hidden">
                     🔥 Sale kết thúc sau: <span id="countdown-timer" class="text-red-500"></span>
                 </div>
-                <div class="flex-grow overflow-y-auto custom-scrollbar pr-1 mb-4">
+                <div class="flex-grow overflow-y-auto pr-1 mb-4">
                     <p class="font-bold text-xs text-gray-800 mb-2">Nội dung chương trình:</p>
                     <div id="detail-content" class="text-[12px] text-gray-600 space-y-1.5 leading-relaxed"></div>
                 </div>
-                <button onclick="openPaymentModal()" class="w-full bg-[#ff4d6d] text-white py-3.5 rounded-xl font-extrabold text-sm uppercase shadow-[0_4px_14px_0_rgba(255,77,109,0.39)] hover:bg-[#ff3355]">Đăng ký ngay</button>
+                <button onclick="openPaymentModal()" class="w-full bg-[#ff4d6d] text-white py-3.5 rounded-xl font-extrabold text-sm uppercase">Đăng ký ngay</button>
             </div>
         </div>
     </div>
 
     <div id="payment-modal" class="overlay fixed inset-0 z-[60] hidden items-center justify-center p-4">
-        <div class="bg-white rounded-[24px] w-full max-w-sm overflow-hidden relative p-6 max-h-[95vh] overflow-y-auto shadow-2xl">
+        <div class="bg-white rounded-[24px] w-full max-w-sm relative p-6 max-h-[95vh] overflow-y-auto shadow-2xl">
             <button onclick="closePaymentModal()" class="absolute top-3 right-3 text-gray-400 text-xl font-bold p-2">✕</button>
-            <h2 class="text-lg font-extrabold mb-4 text-center text-pink-600 uppercase tracking-wider">Hoàn Tất Đăng Ký</h2>
+            <h2 class="text-lg font-extrabold mb-4 text-center text-pink-600 uppercase">Hoàn Tất Đăng Ký</h2>
             <div id="payment-info" class="text-center mb-5"></div>
             <form id="payment-form" onsubmit="handlePayment(event)" class="space-y-4">
-                <div>
-                    <label class="block text-[11px] font-extrabold text-gray-600 mb-1 uppercase">Username Telegram của bạn:</label>
-                    <input type="text" id="user-tele" required placeholder="@username" class="w-full border-2 border-gray-100 p-3 rounded-xl outline-none focus:border-pink-300 font-semibold text-sm transition-colors">
-                </div>
-                <div>
-                    <label class="block text-[11px] font-extrabold text-red-500 mb-1 uppercase">Tải ảnh Bill chuyển khoản:</label>
-                    <input type="file" id="bill-img" accept="image/*" required class="w-full text-xs text-gray-500 file:bg-pink-50 file:border-0 file:rounded-lg file:px-4 file:py-2.5 file:text-pink-600 file:font-bold file:mr-3">
-                </div>
-                <button type="submit" id="submit-btn" class="w-full bg-pink-500 text-white py-3.5 rounded-xl font-extrabold shadow-lg shadow-pink-200 uppercase tracking-wider text-sm mt-2">Gửi cho Sunny duyệt</button>
+                <input type="text" id="user-tele" required placeholder="Username Telegram..." class="w-full border-2 p-3 rounded-xl outline-none font-semibold text-sm">
+                <input type="file" id="bill-img" accept="image/*" required class="w-full text-xs file:bg-pink-50 file:rounded-lg file:px-4 file:py-2 file:text-pink-600 font-bold">
+                <button type="submit" id="submit-btn" class="w-full bg-pink-500 text-white py-3.5 rounded-xl font-extrabold uppercase text-sm mt-2">Gửi cho Sunny duyệt</button>
             </form>
         </div>
     </div>
@@ -109,40 +82,46 @@
 
         let db = { khoa_hoc: [], thu_vien: [] };
         let currentTab = 'hot';
-        let currentCategory = 'All';
-        let searchQuery = '';
         let currentSelectedItem = null;
-        let detailCountdownInterval;
-        let globalTimerInterval; // Interval cho đồng hồ ngoài trang chủ
+        let detailCountdownInterval, globalTimerInterval;
 
         function formatDriveUrl(url) {
             if (!url || !url.includes("drive.google.com")) return url;
-            const idMatch = url.match(/[-\w]{25,}/);
-            if (idMatch) return `https://lh3.googleusercontent.com/d/${idMatch[0]}=w600`;
-            return url;
+            let id = url.match(/[-\w]{25,}/);
+            return id ? `https://lh3.googleusercontent.com/d/$${id[0]}=w600` : url;
         }
 
+        // Hàm chuyển đổi chuỗi ngày sang Date
         function parseDateString(dateStr) {
             if(!dateStr) return null;
             try {
-                const parts = dateStr.trim().split(" ");
-                const timeParts = parts[0].split(":");
-                const dateParts = parts[1].split("/");
-                return new Date(dateParts[2], dateParts[1] - 1, dateParts[0], timeParts[0], timeParts[1]);
+                const p = dateStr.trim().split(" ");
+                const t = p[0].split(":"), d = p[1].split("/");
+                return new Date(d[2], d[1] - 1, d[0], t[0], t[1]);
             } catch(e) { return null; }
         }
 
+        // --- CỐT LÕI KIỂM TRA HẾT HẠN SALE ---
+        function isSaleValid(item) {
+            if (!item["Giá Sale"] || item["Giá Sale"] === item["Giá Gốc"]) return false;
+            const endTime = parseDateString(item["Kết thúc Sale"]);
+            if (!endTime) return true; 
+            return endTime > new Date(); // Chỉ TRẢ VỀ TRUE NẾU SALE CÒN HẠN
+        }
+
         async function loadData() {
-            const grid = document.getElementById('content-grid');
-            grid.innerHTML = '<div class="col-span-2 text-center py-10"><span class="loader"></span></div>';
             try {
                 const res = await fetch(DATA_URL + "?v=" + new Date().getTime());
                 db = await res.json();
                 render();
-                checkUrlAndOpenCourse(); // Kiểm tra xem khách có bấm từ Link Gửi Khách không
-            } catch (e) { 
-                grid.innerHTML = '<div class="col-span-2 text-center text-red-500 font-bold">Lỗi kết nối dữ liệu!</div>';
-            }
+                
+                // MỞ KHÓA HỌC TỰ ĐỘNG TỪ LINK GỬI KHÁCH
+                const urlId = new URLSearchParams(window.location.search).get('id');
+                if (urlId) {
+                    const foundCourse = db.khoa_hoc.find(i => i["ID"] === urlId);
+                    if (foundCourse) openDetailModal(foundCourse);
+                }
+            } catch (e) { document.getElementById('content-grid').innerHTML = 'Lỗi kết nối!'; }
         }
 
         function render() {
@@ -151,232 +130,126 @@
             let list = [];
 
             if (currentTab === 'hot') list = db.khoa_hoc.filter(i => String(i["Khóa Hot"]).toUpperCase() === "TRUE" || i["Khóa Hot"] === "Có" || i["Khóa Hot"] === true);
-            else if (currentTab === 'sale') list = db.khoa_hoc.filter(i => i["Giá Sale"] && i["Giá Sale"] !== i["Giá Gốc"]);
+            else if (currentTab === 'sale') list = db.khoa_hoc.filter(i => isSaleValid(i));
             else if (currentTab === 'library') list = db.thu_vien;
             else list = db.khoa_hoc;
 
-            if (currentCategory !== 'All') list = list.filter(i => i["Phân loại"] === currentCategory);
-            if (searchQuery) list = list.filter(i => (i["Tên khóa"] || i["Tên món"]).toLowerCase().includes(searchQuery.toLowerCase()));
-
-            if (list.length === 0) {
-                grid.innerHTML = '<div class="col-span-2 md:col-span-3 text-center py-10 text-gray-400 font-bold text-sm">Chưa có món nào mục này bạn ơi!</div>';
-                return;
-            }
-
             list.forEach(item => {
                 const card = document.createElement('div');
-                card.className = "bg-white rounded-2xl shadow-sm overflow-hidden relative flex flex-col border border-gray-100";
-                const imgLink = formatDriveUrl(item["Ảnh bìa"] || item["Ảnh"]);
-                const isSale = item["Giá Sale"] && item["Giá Sale"] !== item["Giá Gốc"];
+                card.className = "bg-white rounded-2xl shadow-sm overflow-hidden flex flex-col border border-gray-100";
                 
-                // Gắn thẻ data-endtime để làm đồng hồ đếm ngược
+                const activeSale = isSaleValid(item);
+                const imgLink = formatDriveUrl(item["Ảnh bìa"] || item["Ảnh"]);
+                
                 card.innerHTML = `
                     <div class="relative h-32 bg-gray-50">
-                        <img src="${imgLink}" class="w-full h-full object-cover" loading="lazy" onerror="this.src='https://via.placeholder.com/400x300?text=Sunny'">
-                        ${isSale ? `<div class="sale-badge">SALE</div>` : ''}
-                        <div class="timer-badge global-timer" data-endtime="${item["Kết thúc Sale"] || ''}">⏳ ...</div>
+                        <img src="${imgLink}" class="w-full h-full object-cover">
+                        ${activeSale ? `<div class="sale-badge">SALE</div><div class="timer-badge global-timer" data-endtime="${item["Kết thúc Sale"] || ''}">⏳ ...</div>` : ''}
                     </div>
                     <div class="p-3 flex flex-col flex-grow">
-                        <h3 class="font-extrabold text-[12px] h-8 line-clamp-2 text-gray-800 leading-tight">${item["Tên khóa"] || item["Tên món"]}</h3>
+                        <h3 class="font-extrabold text-[12px] h-8 line-clamp-2">${item["Tên khóa"] || item["Tên món"]}</h3>
                         <div class="mt-auto pt-2">
-                            ${item["Giá Sale"] ? `
-                                <div class="mb-2 flex items-baseline">
-                                    <span class="price-sale text-[15px]">${item["Giá Sale"]}</span>
-                                    <span class="price-old text-[10px]">${item["Giá Gốc"]}</span>
-                                </div>
-                            ` : `<p class="text-[10px] text-pink-400 font-bold mb-2">${item["Phân loại"] || "Học Online"}</p>`}
-                            <button onclick='openDetailModal(${JSON.stringify(item)})' class="w-full py-2 bg-pink-50 text-pink-600 rounded-lg text-[10px] font-extrabold uppercase border border-pink-100 hover:bg-pink-500 hover:text-white">Xem chi tiết</button>
+                            ${activeSale ? `
+                                <div class="mb-2 flex items-baseline"><span class="price-sale text-[15px]">${item["Giá Sale"]}</span><span class="price-old text-[10px]">${item["Giá Gốc"]}</span></div>
+                            ` : `<div class="mb-2"><span class="price-sale text-[15px]">${item["Giá Gốc"] || "Đang cập nhật"}</span></div>`}
+                            <button onclick='openDetailModal(${JSON.stringify(item)})' class="w-full py-2 bg-pink-50 text-pink-600 rounded-lg text-[10px] font-extrabold uppercase">Xem chi tiết</button>
                         </div>
                     </div>
                 `;
                 grid.appendChild(card);
             });
-
-            // Khởi động đồng hồ đếm ngược toàn cục cho trang chủ
             startGlobalTimers();
         }
 
-        // --- CƠ CHẾ ĐỒNG HỒ TRANG CHỦ ---
         function startGlobalTimers() {
             clearInterval(globalTimerInterval);
             globalTimerInterval = setInterval(() => {
-                const timers = document.querySelectorAll('.global-timer');
-                timers.forEach(el => {
-                    const endStr = el.getAttribute('data-endtime');
-                    const endTime = parseDateString(endStr);
+                document.querySelectorAll('.global-timer').forEach(el => {
+                    const endTime = parseDateString(el.getAttribute('data-endtime'));
                     if (endTime && endTime > new Date()) {
                         const diff = endTime - new Date();
-                        const d = Math.floor(diff / (1000 * 60 * 60 * 24));
-                        const h = Math.floor((diff / (1000 * 60 * 60)) % 24);
-                        const m = Math.floor((diff / 1000 / 60) % 60);
-                        const s = Math.floor((diff / 1000) % 60);
-                        
-                        let timeText = `⏳ ${h.toString().padStart(2,'0')}:${m.toString().padStart(2,'0')}:${s.toString().padStart(2,'0')}`;
-                        if(d > 0) timeText = `⏳ ${d} ngày nữa`;
-                        
-                        el.innerText = timeText;
+                        const d = Math.floor(diff / 86400000), h = Math.floor((diff / 3600000) % 24), m = Math.floor((diff / 60000) % 60), s = Math.floor((diff / 1000) % 60);
+                        el.innerText = d > 0 ? `⏳ ${d} ngày nữa` : `⏳ ${h.toString().padStart(2,'0')}:${m.toString().padStart(2,'0')}:${s.toString().padStart(2,'0')}`;
                         el.style.display = 'block';
-                    } else {
-                        el.style.display = 'none';
-                    }
+                    } else el.style.display = 'none';
                 });
             }, 1000);
         }
 
-        // --- CƠ CHẾ TỰ ĐỘNG BẬT KHÓA HỌC KHI CÓ LINK ID ---
-        function checkUrlAndOpenCourse() {
-            const urlParams = new URLSearchParams(window.location.search);
-            const courseId = urlParams.get('id');
-            if (courseId) {
-                // Tìm khóa học có ID tương ứng
-                const foundCourse = db.khoa_hoc.find(item => item["ID"] === courseId);
-                if (foundCourse) {
-                    openDetailModal(foundCourse);
-                    // Đổi URL cho sạch đẹp sau khi mở
-                    window.history.replaceState({}, document.title, window.location.pathname);
-                }
-            }
-        }
-
-        // Các hàm Modal
         function openDetailModal(item) {
             currentSelectedItem = item;
             const modal = document.getElementById('detail-modal');
+            const activeSale = isSaleValid(item);
             
             document.getElementById('detail-img').src = formatDriveUrl(item["Ảnh bìa"] || item["Ảnh"]);
             document.getElementById('detail-title').innerText = item["Tên khóa"] || item["Tên món"];
-            document.getElementById('detail-subtitle').innerText = item["Phân loại"] ? `Phân loại: ${item["Phân loại"]}` : "Tự tay làm bánh ngon tại nhà!";
-            document.getElementById('detail-price-sale').innerText = item["Giá Sale"] || item["Giá Gốc"] || "Miễn phí";
-            document.getElementById('detail-price-old').innerText = (item["Giá Sale"] && item["Giá Sale"] !== item["Giá Gốc"]) ? item["Giá Gốc"] : "";
+            
+            // Hiện giá phụ thuộc vào việc Sale còn hiệu lực hay không
+            document.getElementById('detail-price-sale').innerText = activeSale ? item["Giá Sale"] : (item["Giá Gốc"] || "Miễn phí");
+            document.getElementById('detail-price-old').innerText = activeSale ? item["Giá Gốc"] : "";
 
             clearInterval(detailCountdownInterval);
             const bannerEl = document.getElementById('sale-countdown-banner');
             const timerEl = document.getElementById('countdown-timer');
             const endSaleTime = parseDateString(item["Kết thúc Sale"]);
 
-            if (endSaleTime && !isNaN(endSaleTime.getTime()) && endSaleTime > new Date()) {
+            if (activeSale && endSaleTime) {
                 bannerEl.classList.remove('hidden');
                 detailCountdownInterval = setInterval(() => {
                     const diff = endSaleTime - new Date();
-                    if (diff <= 0) {
-                        timerEl.innerText = "Đã kết thúc";
-                        clearInterval(detailCountdownInterval);
-                    } else {
-                        const d = Math.floor(diff / (1000 * 60 * 60 * 24));
-                        const h = Math.floor((diff / (1000 * 60 * 60)) % 24);
-                        const m = Math.floor((diff / 1000 / 60) % 60);
-                        const s = Math.floor((diff / 1000) % 60);
+                    if (diff <= 0) { bannerEl.classList.add('hidden'); clearInterval(detailCountdownInterval); } 
+                    else {
+                        const d = Math.floor(diff / 86400000), h = Math.floor((diff / 3600000) % 24), m = Math.floor((diff / 60000) % 60), s = Math.floor((diff / 1000) % 60);
                         timerEl.innerText = `${d > 0 ? d+' ngày ' : ''}${h.toString().padStart(2,'0')}:${m.toString().padStart(2,'0')}:${s.toString().padStart(2,'0')}`;
                     }
                 }, 1000);
-            } else {
-                bannerEl.classList.add('hidden');
-            }
+            } else bannerEl.classList.add('hidden');
 
-            let contentHtml = "";
             let rawContent = item["NoiDungChiTiet"];
             if (rawContent && rawContent !== "Không tìm thấy nội dung file mô tả.") {
-                const lines = rawContent.split('\n').filter(line => line.trim() !== '');
-                contentHtml = lines.map(line => {
-                    let cleanLine = line.replace(/^[-+*]\s*/, '').trim();
-                    return `<div class="flex items-start mb-1.5"><span class="text-blue-600 mr-2 font-bold">✔️</span> <span class="font-medium">${cleanLine}</span></div>`;
-                }).join('');
-            } else {
-                contentHtml = `<p class="italic text-gray-400 text-center">Nội dung đang được cập nhật...</p>`;
-            }
-            document.getElementById('detail-content').innerHTML = contentHtml;
+                document.getElementById('detail-content').innerHTML = rawContent.split('\n').filter(l => l.trim() !== '').map(l => `<div class="flex items-start mb-1.5"><span class="text-blue-600 mr-2">✔️</span> <span>${l.replace(/^[-+*]\s*/, '')}</span></div>`).join('');
+            } else document.getElementById('detail-content').innerHTML = "Đang cập nhật...";
 
-            modal.classList.remove('hidden');
-            modal.classList.add('flex');
+            modal.classList.remove('hidden'); modal.classList.add('flex');
         }
 
-        function closeDetailModal() { 
-            const modal = document.getElementById('detail-modal');
-            modal.classList.remove('flex');
-            modal.classList.add('hidden');
-            clearInterval(detailCountdownInterval);
-        }
+        function closeDetailModal() { document.getElementById('detail-modal').classList.add('hidden'); document.getElementById('detail-modal').classList.remove('flex'); clearInterval(detailCountdownInterval); }
 
         function openPaymentModal() {
             closeDetailModal(); 
             const item = currentSelectedItem;
-            const modal = document.getElementById('payment-modal');
-            const info = document.getElementById('payment-info');
-            const qrLink = formatDriveUrl(item["QR Ngân hàng"]);
+            const activeSale = isSaleValid(item);
+            // Lấy đúng giá để thanh toán
+            const price = activeSale ? item["Giá Sale"] : (item["Giá Gốc"] || "0đ");
 
-            info.innerHTML = `
-                <p class="text-gray-800 font-extrabold text-sm mb-3">Khóa: <span class="text-pink-500">${item["Tên khóa"] || item["Tên món"]}</span></p>
-                ${qrLink ? `<img src="${qrLink}" class="w-40 h-40 mx-auto border-4 border-pink-50 rounded-2xl shadow-sm mb-3" onerror="this.style.display='none'">` : ''}
-                <div class="space-y-1.5 text-xs bg-gray-50 border border-gray-100 p-3 rounded-xl text-left">
-                    <p><b>Cần thanh toán:</b> <span class="text-red-500 font-extrabold text-sm">${item["Giá Sale"] || item["Giá Gốc"] || "0đ"}</span></p>
-                    <p><b>Ngân hàng:</b> ${item["Ngân hàng"] || "Chưa cập nhật"}</p>
-                    <p><b>Số tài khoản:</b> <span class="text-blue-600 font-bold select-all">${item["STK"] || ""}</span></p>
-                    <p><b>Chủ TK:</b> ${item["Chủ TK"] || ""}</p>
-                    <p class="text-[10px] text-gray-500 italic mt-2 border-t pt-2">Nội dung CK: Tên Tele + ${item["ID"] || ""}</p>
+            document.getElementById('payment-info').innerHTML = `
+                <p class="font-bold text-sm mb-3">Khóa: <span class="text-pink-500">${item["Tên khóa"]}</span></p>
+                <div class="text-xs bg-gray-50 p-3 rounded-xl text-left border">
+                    <p><b>Thanh toán:</b> <span class="text-red-500 font-bold">${price}</span></p>
+                    <p><b>Ngân hàng:</b> ${item["Ngân hàng"]}</p>
+                    <p><b>Số TK:</b> <span class="text-blue-600 font-bold">${item["STK"]}</span></p>
+                    <p><b>Chủ TK:</b> ${item["Chủ TK"]}</p>
+                    <p class="mt-2 border-t pt-2 text-gray-500">Nội dung CK: Tên Tele + ${item["ID"]}</p>
                 </div>
             `;
-            
-            modal.classList.remove('hidden');
-            modal.classList.add('flex');
+            document.getElementById('payment-modal').classList.remove('hidden');
+            document.getElementById('payment-modal').classList.add('flex');
         }
 
-        function closePaymentModal() { 
-            const modal = document.getElementById('payment-modal');
-            modal.classList.remove('flex');
-            modal.classList.add('hidden');
-        }
-
-        function changeTab(tab) {
-            currentTab = tab;
-            document.querySelectorAll('#tab-menu button').forEach(b => b.classList.remove('active-tab'));
-            document.getElementById('tab-' + tab)?.classList.add('active-tab');
-            document.getElementById('filter-bar').classList.toggle('hidden', !(tab === 'all' || tab === 'library'));
-            render();
-        }
-        function filterSearch() { searchQuery = document.getElementById('search-input').value; render(); }
-        function setCategory(cat) { currentCategory = cat; render(); }
-
+        function closePaymentModal() { document.getElementById('payment-modal').classList.add('hidden'); document.getElementById('payment-modal').classList.remove('flex'); }
+        function changeTab(t) { currentTab = t; document.querySelectorAll('#tab-menu button').forEach(b => b.classList.remove('active-tab')); document.getElementById('tab-'+t).classList.add('active-tab'); render(); }
+        
         async function handlePayment(e) {
             e.preventDefault();
-            const btn = document.getElementById('submit-btn');
+            document.getElementById('submit-btn').innerHTML = 'Đang gửi...';
             const item = currentSelectedItem;
-            
-            const lastSent = localStorage.getItem('lastSent');
-            if (lastSent && Date.now() - lastSent < 30000) {
-                alert("Bạn gửi nhanh quá, vui lòng đợi 30 giây nhé!"); return;
-            }
-
-            btn.disabled = true;
-            btn.innerHTML = '<span class="loader"></span> Đang gửi...';
-
-            const fileInput = document.getElementById('bill-img');
-            const file = fileInput.files[0];
-            const reader = new FileReader();
-            reader.readAsDataURL(file);
-            reader.onload = async () => {
-                const payload = {
-                    userTele: document.getElementById('user-tele').value,
-                    tenKhoa: item["Tên khóa"] || item["Tên món"],
-                    soTien: item["Giá Sale"] || item["Giá Gốc"],
-                    anhBase64: reader.result,
-                    mimeType: file.type,
-                    tenFile: file.name
-                };
-
-                try {
-                    const res = await fetch(WEBHOOK_URL, { method: 'POST', body: JSON.stringify(payload) });
-                    const result = await res.json();
-                    if (result.status === 'success') {
-                        alert("🎉 GỬI THÀNH CÔNG!\nSunny đã nhận được yêu cầu, bạn chờ duyệt xíu nhé.");
-                        localStorage.setItem('lastSent', Date.now());
-                        closePaymentModal();
-                    } else { throw new Error(); }
-                } catch (err) { alert("Lỗi kết nối! Bạn chụp màn hình gửi trực tiếp cho Sunny nhé."); }
-                btn.disabled = false;
-                btn.innerText = 'Gửi cho Sunny duyệt';
+            const f = document.getElementById('bill-img').files[0];
+            const r = new FileReader(); r.readAsDataURL(f);
+            r.onload = async () => {
+                await fetch(WEBHOOK_URL, { method: 'POST', body: JSON.stringify({ userTele: document.getElementById('user-tele').value, tenKhoa: item["Tên khóa"], soTien: isSaleValid(item) ? item["Giá Sale"] : item["Giá Gốc"], anhBase64: r.result, mimeType: f.type, tenFile: f.name }) });
+                alert("🎉 Đã gửi đơn thành công!"); closePaymentModal(); document.getElementById('submit-btn').innerHTML = 'Gửi cho Sunny duyệt';
             };
         }
-
         loadData();
     </script>
 </body>
