@@ -51,7 +51,7 @@
 
     <div id="modal-overlay" class="fixed inset-0 z-[60] flex items-center justify-center p-4">
         <div class="bg-white rounded-2xl w-full max-w-md overflow-hidden relative p-5 max-h-[90vh] overflow-y-auto">
-            <h2 class="text-lg font-bold mb-4 text-center">ĐĂNG KÝ KHÓA HỌC</h2>
+            <h2 class="text-lg font-bold mb-4 text-center text-pink-600">ĐĂNG KÝ KHÓA HỌC</h2>
             <div id="payment-info" class="text-sm space-y-2 mb-4 bg-gray-50 p-3 rounded-lg"></div>
             
             <form id="payment-form" onsubmit="handlePayment(event)" class="space-y-3">
@@ -64,20 +64,19 @@
                 </div>
                 
                 <div>
-                    <label class="block text-xs font-semibold mb-1">Tải ảnh Bill chuyển khoản:</label>
+                    <label class="block text-xs font-semibold mb-1 text-red-500">Tải ảnh Bill chuyển khoản:</label>
                     <input type="file" id="bill-img" accept="image/*" required class="w-full text-sm">
                 </div>
 
                 <input type="text" name="hp_field" style="display:none !important" tabindex="-1">
 
-                <button type="submit" id="submit-btn" class="w-full bg-pink-500 text-white py-3 rounded-xl font-bold shadow-lg shadow-pink-200">GỬI YÊU CẦU DUYỆT</button>
-                <button type="button" onclick="closeModal()" class="w-full text-gray-400 text-sm mt-2 text-center">Để sau</button>
+                <button type="submit" id="submit-btn" class="w-full bg-pink-500 text-white py-3 rounded-xl font-bold shadow-lg shadow-pink-200 uppercase tracking-wider">Gửi đơn duyệt ngay</button>
+                <button type="button" onclick="closeModal()" class="w-full text-gray-400 text-sm mt-2 text-center underline">Đóng lại</button>
             </form>
         </div>
     </div>
 
     <script>
-        // --- CẤU HÌNH (ĐÃ FIX LỖI DẤU NGOẶC) ---
         const DATA_URL = "https://raw.githubusercontent.com/thienha336501903-a11y/du-lieu-web/refs/heads/main/data.json";
         const WEBHOOK_URL = "https://script.google.com/macros/s/AKfycbxMoBcW-PXxjY3TQ15JLUeTxjugff4y6yY9QfqLV1IVZh8kC3ezkYpBnpqgpaMiDbEv0Q/exec";
 
@@ -85,6 +84,17 @@
         let currentTab = 'hot';
         let currentCategory = 'All';
         let searchQuery = '';
+
+        // Hàm xử lý link Google Drive để vượt rào hiển thị
+        function formatDriveUrl(url) {
+            if (!url || !url.includes("drive.google.com")) return url;
+            const idMatch = url.match(/[-\w]{25,}/);
+            if (idMatch) {
+                // Sử dụng Proxy hình ảnh của Google để load nhanh và không bị chặn
+                return `https://lh3.googleusercontent.com/d/${idMatch[0]}=w800`;
+            }
+            return url;
+        }
 
         async function loadData() {
             const grid = document.getElementById('content-grid');
@@ -94,7 +104,7 @@
                 db = await res.json();
                 render();
             } catch (e) { 
-                grid.innerHTML = '<div class="col-span-2 text-center text-red-500">Lỗi kết nối dữ liệu!</div>';
+                grid.innerHTML = '<div class="col-span-2 text-center text-red-500 font-bold">Lỗi kết nối dữ liệu! Thử tải lại trang.</div>';
             }
         }
 
@@ -103,7 +113,6 @@
             grid.innerHTML = '';
             let list = [];
 
-            // Phân loại danh sách theo Tab
             if (currentTab === 'hot') {
                 list = db.khoa_hoc.filter(i => String(i["Khóa Hot"]).toUpperCase() === "TRUE" || i["Khóa Hot"] === "Có" || i["Khóa Hot"] === true);
             } else if (currentTab === 'sale') {
@@ -114,7 +123,6 @@
                 list = db.khoa_hoc;
             }
 
-            // Lọc theo Category & Search
             if (currentCategory !== 'All') {
                 list = list.filter(i => i["Phân loại"] === currentCategory);
             }
@@ -123,31 +131,33 @@
             }
 
             if (list.length === 0) {
-                grid.innerHTML = '<div class="col-span-2 text-center py-10 text-gray-400">Không có món nào ở mục này.</div>';
+                grid.innerHTML = '<div class="col-span-2 text-center py-10 text-gray-400">Chưa có món nào mục này bạn ơi!</div>';
                 return;
             }
 
             list.forEach(item => {
                 const card = document.createElement('div');
-                card.className = "bg-white rounded-xl shadow-sm overflow-hidden relative flex flex-col";
-                const imgLink = item["Ảnh bìa"] || item["Ảnh"] || "https://via.placeholder.com/300x200?text=Sunny+Bakery";
+                card.className = "bg-white rounded-xl shadow-sm overflow-hidden relative flex flex-col border border-pink-50";
+                
+                // Áp dụng formatDriveUrl cho ảnh bìa
+                const imgLink = formatDriveUrl(item["Ảnh bìa"] || item["Ảnh"]);
                 const isSale = item["Giá Sale"] && item["Giá Sale"] !== item["Giá Gốc"];
                 
                 card.innerHTML = `
-                    <div class="relative h-32">
-                        <img src="${imgLink}" class="w-full h-full object-cover">
-                        ${isSale ? `<div class="sale-badge">GIẢM GIÁ</div>` : ''}
+                    <div class="relative h-36 bg-gray-50">
+                        <img src="${imgLink}" class="w-full h-full object-cover" loading="lazy" onerror="this.src='https://via.placeholder.com/300x200?text=Sunny+Bakery'">
+                        ${isSale ? `<div class="sale-badge uppercase font-bold">SALE</div>` : ''}
                     </div>
                     <div class="p-2 flex flex-col flex-grow">
-                        <h3 class="font-bold text-xs h-8 line-clamp-2 text-gray-800">${item["Tên khóa"] || item["Tên món"]}</h3>
+                        <h3 class="font-bold text-[13px] h-9 line-clamp-2 text-gray-800 leading-tight">${item["Tên khóa"] || item["Tên món"]}</h3>
                         <div class="mt-auto pt-2">
                             ${item["Giá Sale"] ? `
                                 <div class="mb-1">
-                                    <span class="price-sale text-sm">${item["Giá Sale"]}</span>
-                                    <span class="price-old text-[10px] ml-1">${item["Giá Gốc"]}</span>
+                                    <p class="price-sale text-sm leading-none">${item["Giá Sale"]}</p>
+                                    <p class="price-old text-[10px] leading-none mt-1">${item["Giá Gốc"]}</p>
                                 </div>
-                            ` : `<p class="text-[10px] text-pink-400 mb-1">${item["Phân loại"] || "Khóa học"}</p>`}
-                            <button onclick='showDetail(${JSON.stringify(item)})' class="w-full py-1.5 bg-pink-50 text-pink-500 rounded-lg text-[10px] font-bold border border-pink-100 uppercase">Đăng ký ngay</button>
+                            ` : `<p class="text-[11px] text-pink-400 font-bold mb-1">${item["Phân loại"] || "Học Online"}</p>`}
+                            <button onclick='showDetail(${JSON.stringify(item)})' class="w-full py-2 bg-pink-500 text-white rounded-lg text-[11px] font-bold shadow-sm active:scale-95 transition-transform uppercase">Xem & Đăng ký</button>
                         </div>
                     </div>
                 `;
@@ -175,19 +185,23 @@
             const info = document.getElementById('payment-info');
             
             document.getElementById('form-ten-khoa').value = item["Tên khóa"] || item["Tên món"];
-            document.getElementById('form-so-tien').value = item["Giá Sale"] || item["Giá Gốc"] || "Miễn phí";
+            document.getElementById('form-so-tien').value = item["Giá Sale"] || item["Giá Gốc"] || "0";
+
+            // Áp dụng formatDriveUrl cho QR Ngân hàng
+            const qrLink = formatDriveUrl(item["QR Ngân hàng"]);
 
             info.innerHTML = `
-                <p class="text-pink-500 font-bold text-base text-center mb-2">${item["Tên khóa"] || item["Tên món"]}</p>
-                <div class="space-y-1 text-[13px]">
-                    <p><b>Giá:</b> <span class="text-red-500">${item["Giá Sale"] || item["Giá Gốc"] || "Miễn phí"}</span></p>
-                    <p><b>Ngân hàng:</b> ${item["Ngân hàng"] || "Đang cập nhật"}</p>
-                    <p><b>Số TK:</b> <span class="text-blue-600 font-bold">${item["STK"] || ""}</span></p>
-                    <p><b>Chủ TK:</b> ${item["Chủ TK"] || ""}</p>
+                <div class="text-center mb-4">
+                    <p class="text-pink-600 font-bold text-lg leading-tight uppercase mb-2">${item["Tên khóa"] || item["Tên món"]}</p>
+                    ${qrLink ? `<img src="${qrLink}" class="w-48 h-48 mx-auto border-2 border-pink-100 rounded-xl shadow-sm" onerror="this.style.display='none'">` : ''}
                 </div>
-                <div class="mt-3 p-2 bg-yellow-50 border border-yellow-100 rounded text-[11px] text-yellow-700">
-                    💡 Chụp ảnh màn hình giao dịch chuyển khoản và tải lên bên dưới để được duyệt khóa học nhanh nhất!
+                <div class="space-y-1 text-[13px] bg-white border border-pink-100 p-3 rounded-xl shadow-inner">
+                    <p><b>Giá bán:</b> <span class="text-red-500 font-bold">${item["Giá Sale"] || item["Giá Gốc"] || "Miễn phí"}</span></p>
+                    <p><b>Ngân hàng:</b> ${item["Ngân hàng"] || "Chưa cập nhật"}</p>
+                    <p><b>Số tài khoản:</b> <span class="text-blue-600 font-bold select-all">${item["STK"] || ""}</span></p>
+                    <p><b>Chủ tài khoản:</b> ${item["Chủ TK"] || ""}</p>
                 </div>
+                <p class="mt-3 text-[11px] text-gray-500 italic text-center">Nội dung chuyển khoản: ${item["ID"] || "Chuyển khoản học bánh"}</p>
             `;
             modal.style.display = 'flex';
         }
@@ -199,14 +213,21 @@
             const btn = document.getElementById('submit-btn');
             
             const lastSent = localStorage.getItem('lastSent');
-            if (lastSent && Date.now() - lastSent < 60000) {
-                alert("⏳ Bạn vừa gửi đơn, vui lòng đợi 1 phút để tránh spam!"); return;
+            if (lastSent && Date.now() - lastSent < 30000) {
+                alert("Vui lòng đợi 30 giây để gửi tiếp bạn nhé!"); return;
             }
 
             btn.disabled = true;
-            btn.innerHTML = '<span class="loader"></span> Đang xử lý...';
+            btn.innerHTML = '<span class="loader"></span> Đang gửi yêu cầu...';
 
-            const file = document.getElementById('bill-img').files[0];
+            const fileInput = document.getElementById('bill-img');
+            if (!fileInput.files[0]) {
+                alert("Bạn chưa chọn ảnh Bill thanh toán!");
+                btn.disabled = false; btn.innerText = 'Gửi đơn duyệt ngay';
+                return;
+            }
+
+            const file = fileInput.files[0];
             const reader = new FileReader();
             reader.readAsDataURL(file);
             reader.onload = async () => {
@@ -223,15 +244,13 @@
                     const res = await fetch(WEBHOOK_URL, { method: 'POST', body: JSON.stringify(payload) });
                     const result = await res.json();
                     if (result.status === 'success') {
-                        alert("✅ ĐÃ GỬI ĐƠN!\nAdmin sẽ kiểm tra và duyệt cho bạn sớm nhé.");
+                        alert("✅ GỬI THÀNH CÔNG!\nBạn chờ Sunny kiểm tra và duyệt đơn nhé.");
                         localStorage.setItem('lastSent', Date.now());
                         closeModal();
-                    } else {
-                        throw new Error();
-                    }
-                } catch (err) { alert("❌ Lỗi hệ thống! Vui lòng chụp màn hình và liên hệ Admin."); }
+                    } else { throw new Error(); }
+                } catch (err) { alert("Lỗi kết nối! Vui lòng chụp màn hình gửi trực tiếp cho Admin."); }
                 btn.disabled = false;
-                btn.innerText = 'GỬI YÊU CẦU DUYỆT';
+                btn.innerText = 'Gửi đơn duyệt ngay';
             };
         }
 
@@ -239,3 +258,4 @@
     </script>
 </body>
 </html>
+ 
